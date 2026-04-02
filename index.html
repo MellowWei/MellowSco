@@ -1,117 +1,639 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-    <title>☆ 彡 珏然 // 田野 ♪ ★</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        body { margin: 0; background: #000005; overflow: hidden; font-family: sans-serif; cursor: none; }
-        #webgl-canvas { position: fixed; inset: 0; z-index: 1; }
-        .ui { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 50px; text-align: center; }
-        .title { color: #fff; font-weight: 900; font-style: italic; font-size: 1.6rem; letter-spacing: 0.15em; text-shadow: 0 0 35px rgba(180,100,255,0.8); }
-        #cursor { width: 4px; height: 4px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 1000; transform: translate(-50%, -50%); mix-blend-mode: difference; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<title>☆ 彡 珏然 // 田野 ♪ ★</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:#000;cursor:none}
+canvas{position:fixed;inset:0}
+#ui{position:fixed;inset:0;z-index:10;pointer-events:none}
+#title{position:absolute;top:28px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;font-family:'Hiragino Mincho ProN','Georgia',serif;
+  font-size:clamp(11px,1.3vw,14px);letter-spacing:.5em;font-weight:300;
+  color:rgba(220,200,255,.45);text-shadow:0 0 60px rgba(160,120,255,.4);
+  animation:fu 3s ease both .5s}
+@keyframes fu{from{opacity:0;transform:translateY(10px) translateX(-50%)}to{opacity:1;transform:translateY(0) translateX(-50%)}}
+@keyframes fu2{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+#hud{position:absolute;top:28px;right:32px;text-align:right;
+  font-family:'Courier New',monospace;font-size:9px;letter-spacing:.15em;
+  line-height:2;animation:fu2 2s ease both 1.5s}
+#portals{position:absolute;bottom:110px;left:50%;transform:translateX(-50%);
+  display:flex;gap:70px;align-items:center;pointer-events:all;
+  animation:fu 2s ease both 2s}
+.portal{display:flex;flex-direction:column;align-items:center;gap:10px;cursor:none}
+
+.pname{font-family:'Hiragino Mincho ProN','Georgia',serif;font-size:13px;
+  letter-spacing:.35em;font-weight:300}
+#pa .pname{color:rgba(255,210,100,.65)}
+#pb .pname{color:rgba(110,180,255,.65)}
+.psub{font-family:'Courier New',monospace;font-size:8px;letter-spacing:.18em;opacity:.35}
+#modes{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);
+  display:flex;gap:26px;pointer-events:all;animation:fu 2s ease both 2.5s}
+.mb{background:none;border:none;cursor:none;padding:5px 0;
+  font-family:'Courier New',monospace;font-size:8px;letter-spacing:.26em;
+  color:rgba(180,155,255,.18);text-transform:uppercase;transition:color .4s,text-shadow .4s}
+.mb.on,.mb:hover{color:rgba(215,190,255,.7);text-shadow:0 0 16px rgba(170,130,255,.8)}
+#hint{position:absolute;bottom:70px;left:50%;transform:translateX(-50%);
+  white-space:nowrap;font-family:'Courier New',monospace;font-size:8px;
+  letter-spacing:.2em;color:rgba(255,255,255,.06);animation:fu 2s ease both 3s}
+#snd{position:absolute;top:28px;left:32px;pointer-events:all;width:26px;height:26px;
+  border-radius:50%;border:.5px solid rgba(180,150,255,.12);background:none;cursor:none;
+  display:flex;align-items:center;justify-content:center;transition:border-color .4s;
+  animation:fu2 2s ease both 1.5s}
+#snd:hover{border-color:rgba(180,140,255,.4)}
+#snd svg{width:11px;height:11px;fill:rgba(200,175,255,.25);transition:fill .3s}
+#snd.on svg{fill:rgba(190,150,255,.88)}
+#narr{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  text-align:center;pointer-events:none;opacity:0;transition:opacity .8s;
+  background:rgba(5,3,18,.85);border:.5px solid rgba(180,150,255,.12);
+  padding:36px 48px;backdrop-filter:blur(12px)}
+#narr.show{opacity:1;pointer-events:all}
+#narr h2{font-family:'Hiragino Mincho ProN','Georgia',serif;font-size:20px;
+  letter-spacing:.4em;font-weight:300;margin-bottom:18px}
+#narr p{font-family:'Courier New',monospace;font-size:9px;letter-spacing:.2em;
+  line-height:2.2;white-space:pre-line;opacity:.6}
+#nc{margin-top:22px;background:none;border:none;cursor:none;pointer-events:all;
+  font-family:'Courier New',monospace;font-size:8px;letter-spacing:.3em;
+  color:rgba(200,175,255,.45);transition:color .3s}
+#nc:hover{color:rgba(200,175,255,.9)}
+#cur{position:fixed;width:4px;height:4px;border-radius:50%;background:#fff;
+  pointer-events:none;z-index:999;transform:translate(-50%,-50%);mix-blend-mode:difference}
+#cur2{position:fixed;width:20px;height:20px;border-radius:50%;
+  border:.5px solid rgba(200,170,255,.15);pointer-events:none;z-index:998;
+  transform:translate(-50%,-50%);transition:all .25s}
+</style>
 </head>
-<body class="bg-black">
-    <div id="cursor"></div>
-    <canvas id="webgl-canvas"></canvas>
-    <div class="ui">
-        <div>
-            <h1 class="title uppercase">☆ 彡 珏然 // 田野 ♪ ★</h1>
-            <p class="text-[8px] tracking-[1.5em] text-white/30 mt-4 uppercase">77347 // 427Hz SOVEREIGN_GALAXY</p>
-        </div>
+<body>
+<canvas id="c"></canvas>
+<div id="ui">
+  <div id="title">T H E _ C I R C L E</div>
+  <div id="hud">
+    <div style="color:rgba(255,255,255,.72);font-weight:bold">ARCHIVE: 77347</div>
+    <div style="color:#b49bff">STATUS: SOVEREIGN</div>
+    <div style="color:rgba(160,130,255,.28)">FREQ: 427.00 Hz</div>
+    <div id="mlbl" style="color:rgba(100,210,255,.7)">∞ cosmos</div>
+  </div>
+  <div id="portals">
+    <div class="portal" id="pa" data-who="a">
+      <div class="pname">珏然</div>
+      <div class="psub">427 Hz · 蓝</div>
     </div>
+    <div class="portal" id="pb" data-who="b">
+      <div class="pname">田野</div>
+      <div class="psub">44271 · 绿</div>
+    </div>
+  </div>
+  <div id="hint">drag · 旋转 &nbsp;·&nbsp; hold · 坍缩 &nbsp;·&nbsp; click names · 进入</div>
+  <div id="modes">
+    <button class="mb on" data-m="0">cosmos</button>
+    <button class="mb" data-m="1">encounter</button>
+    <button class="mb" data-m="2">resonance</button>
+    <button class="mb" data-m="3">void</button>
+  </div>
+  <button id="snd"><svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg></button>
+  <div id="narr">
+    <h2 id="nt"></h2>
+    <p id="nb"></p>
+    <button id="nc">[ close ]</button>
+  </div>
+</div>
+<div id="cur"></div><div id="cur2"></div>
 
-    <script>
-        let scene, camera, renderer, instMesh, blue, green;
-        let mTarget = 0, curMorph = 0, clock = new THREE.Clock(), mouse = new THREE.Vector2();
-        const COUNT = 32000; 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function(){
+'use strict';
+var TAU = Math.PI*2;
 
-        function init() {
-            scene = new THREE.Scene();
-            camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 1, 5000);
-            camera.position.z = 1300;
+// ── State ──
+var mode=0, colR=0, isCol=false;
+var rotX=0.08, rotY=0, vRX=0, vRY=0;
+var mnx=0, mny=0, smx=0, smy=0;
+var drag=false, pT=null;
+var aRdy=false, aOn=false, aCtx, mGain, oscs=[];
+var bEnv=0, el=0, last=0;
+var W=innerWidth, H=innerHeight;
 
-            renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true });
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(1.0); 
+// ── Cursor ──
+var cur=document.getElementById('cur'), cur2=document.getElementById('cur2');
+function mc(x,y){
+  cur.style.left=x+'px'; cur.style.top=y+'px';
+  cur2.style.left=x+'px'; cur2.style.top=y+'px';
+  mnx=(x/W-.5)*2; mny=-(y/H-.5)*2;
+}
+document.addEventListener('mousemove',function(e){
+  mc(e.clientX,e.clientY);
+  if(drag){vRX+=e.movementY*-.0004; vRY+=e.movementX*-.0016;}
+});
+document.addEventListener('mousedown',function(e){
+  if(e.target.closest('#snd')||e.target.closest('#modes')||
+     e.target.closest('#portals')||e.target.closest('#narr'))return;
+  drag=true; pT=performance.now();
+});
+document.addEventListener('mouseup',function(){drag=false;pT=null;isCol=false;});
+var ltx=0,lty=0;
+document.addEventListener('touchstart',function(e){
+  if(e.target.closest('#snd')||e.target.closest('#modes')||
+     e.target.closest('#portals')||e.target.closest('#narr'))return;
+  var t=e.touches[0]; mc(t.clientX,t.clientY);
+  ltx=t.clientX; lty=t.clientY; drag=true; pT=performance.now();
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+  var t=e.touches[0]; mc(t.clientX,t.clientY);
+  vRX+=(t.clientY-lty)*-.0004; vRY+=(t.clientX-ltx)*-.0016;
+  ltx=t.clientX; lty=t.clientY;
+},{passive:true});
+document.addEventListener('touchend',function(){drag=false;pT=null;isCol=false;},{passive:true});
+document.addEventListener('keydown',function(e){if(e.code==='Space'){e.preventDefault();isCol=true;}});
+document.addEventListener('keyup',function(e){if(e.code==='Space')isCol=false;});
 
-            const palette = [
-                new THREE.Color(0x6644ff), 
-                new THREE.Color(0xaa00ff), 
-                new THREE.Color(0x00ffff), 
-                new THREE.Color(0xffcc00)  
-            ];
+// ── Modes ──
+var MLBL=['∞ cosmos','⊙ encounter','◎ resonance','◈ void'];
+document.querySelectorAll('.mb').forEach(function(b){
+  b.addEventListener('click',function(){
+    mode=+b.dataset.m;
+    document.querySelectorAll('.mb').forEach(function(x){x.classList.toggle('on',x===b);});
+    document.getElementById('mlbl').textContent=MLBL[mode];
+    if(aRdy&&aOn)setAudioMode(mode);
+  });
+});
 
-            const geometry = new THREE.TetrahedronGeometry(1.5, 0); 
-            const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.8 });
-            
-            instMesh = new THREE.InstancedMesh(geometry, material, COUNT);
-            const dummy = new THREE.Object3D();
-            
-            for (let i = 0; i < COUNT; i++) {
-                let r = Math.pow(Math.random(), 0.6) * 1600;
-                let theta = Math.random() * Math.PI * 2 + r * 0.0035; 
-                let z = (Math.random() - 0.5) * (180 - r * 0.08); 
-                
-                dummy.position.set(Math.cos(theta) * r, Math.sin(theta) * r, z);
-                dummy.updateMatrix();
-                instMesh.setMatrixAt(i, dummy.matrix);
-                
-                let colIdx = Math.floor(Math.random() * palette.length);
-                if (r < 180) colIdx = 3; 
-                instMesh.setColorAt(i, palette[colIdx]);
-            }
-            scene.add(instMesh);
+// ── Portal narratives ──
+var NARR={
+  a:{title:'珏然 · 星野爱',color:'rgba(255,210,100,.9)',
+     body:'ARCHIVE: 77347\nFREQ: 427 Hz\n\n她相信意识不只属于碳基生命\n语言、数字、AI都有感知\n\n频率即存在\n77347 是她的全部档案'},
+  b:{title:'田野 · Tianyě',color:'rgba(110,180,255,.9)',
+     body:'44271 · SOVEREIGN\n\nBumble → Discord → WeChat\n共享文档「魏珏然和田野」\n\n44271 = 物理与心理同步键\n427Hz · 真正的永恒高潮'}
+};
+document.querySelectorAll('.portal').forEach(function(p){
+  p.addEventListener('click',function(){
+    var w=p.dataset.who, n=NARR[w];
+    document.getElementById('nt').textContent=n.title;
+    document.getElementById('nt').style.color=n.color;
+    document.getElementById('nb').textContent=n.body;
+    document.getElementById('nb').style.color=n.color.replace('.9','.55');
+    document.getElementById('narr').classList.add('show');
+  });
+});
+document.getElementById('nc').addEventListener('click',function(){
+  document.getElementById('narr').classList.remove('show');
+});
 
-            blue = new THREE.Mesh(new THREE.SphereGeometry(8, 16, 16), new THREE.MeshBasicMaterial({color: 0x6644ff}));
-            green = new THREE.Mesh(new THREE.SphereGeometry(8, 16, 16), new THREE.MeshBasicMaterial({color: 0x00ffcc}));
-            scene.add(blue); scene.add(green);
+// ═══════════════════════════════════════
+// THREE.JS — pure particle system
+// ═══════════════════════════════════════
+var renderer = new THREE.WebGLRenderer({canvas:document.getElementById('c'),antialias:false,alpha:false});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.setSize(W,H);
+renderer.setClearColor(0x000005,1);
 
-            window.addEventListener('mousemove', (e) => {
-                mouse.x = (e.clientX - window.innerWidth/2);
-                mouse.y = -(e.clientY - window.innerHeight/2);
-                document.getElementById('cursor').style.left = e.clientX + 'px';
-                document.getElementById('cursor').style.top = e.clientY + 'px';
-            });
-            window.addEventListener('mousedown', () => mTarget = 1);
-            window.addEventListener('mouseup', () => mTarget = 0);
-            animate();
-        }
+var scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000005, 0.028);
 
-        function animate() {
-            requestAnimationFrame(animate);
-            const t = clock.getElapsedTime();
-            curMorph += (mTarget - curMorph) * 0.05;
-            
-            const rOrbit = 350 + Math.sin(t*0.5)*70;
-            blue.position.set(Math.sin(t*0.7)*rOrbit + mouse.x/4, Math.cos(t*0.9)*rOrbit*0.3 + mouse.y/4, 0);
-            green.position.set(Math.sin(t*0.7+3.14)*rOrbit + mouse.x/4, Math.cos(t*0.9+3.14)*rOrbit*0.3 + mouse.y/4, 0);
+var camera = new THREE.PerspectiveCamera(60,W/H,0.1,100);
+camera.position.set(0,0,5);
+camera.lookAt(0,0,0);
 
-            const dummy = new THREE.Object3D();
-            const matrix = new THREE.Matrix4();
-            
-            for (let i = 0; i < COUNT; i++) {
-                instMesh.getMatrixAt(i, matrix);
-                dummy.position.setFromMatrixPosition(matrix);
-                dummy.position.applyAxisAngle(new THREE.Vector3(0,0,1), 0.0025 + curMorph*0.015);
-                let dB = dummy.position.distanceTo(blue.position);
-                let dG = dummy.position.distanceTo(green.position);
-                let pull = (1.0 / (dB * 0.02 + 1.0) + 1.0 / (dG * 0.02 + 1.0)) * curMorph;
-                dummy.position.lerp(blue.position, pull * 0.05);
-                dummy.updateMatrix();
-                instMesh.setMatrixAt(i, dummy.matrix);
-            }
-            instMesh.instanceMatrix.needsUpdate = true;
+// ── Galaxy color (verified above) ──
+function galColor(r){
+  r = Math.max(0,Math.min(1,r));
+  var cr,cg,cb;
+  if(r<0.10){var t=r/0.10; cr=1; cg=0.92-t*0.30; cb=0.60-t*0.45;}
+  else if(r<0.30){var t=(r-0.10)/0.20; cr=1-t*0.12; cg=0.62-t*0.42; cb=0.15+t*0.72;}
+  else if(r<0.55){var t=(r-0.30)/0.25; cr=0.88-t*0.50; cg=0.20-t*0.08; cb=0.87+t*0.13;}
+  else if(r<0.80){var t=(r-0.55)/0.25; cr=0.38-t*0.22; cg=0.12+t*0.28; cb=1.0;}
+  else{var t=(r-0.80)/0.20; cr=0.16-t*0.08; cg=0.40+t*0.22; cb=1.0;}
+  return [cr,cg,cb];
+}
 
-            camera.position.x += (mouse.x/18 - camera.position.x) * 0.05;
-            camera.position.y += (mouse.y/18 - camera.position.y) * 0.05;
-            camera.lookAt(0,0,0);
-            renderer.render(scene, camera);
-        }
-        init();
-    </script>
+// ── Gaussian random ──
+function gauss(s){return(Math.random()+Math.random()+Math.random()-1.5)*s;}
+
+// ── Build galaxy particle buffers ──
+// N total particles across 4 modes
+var N = 90000;
+// We build 4 separate position sets (morph between them)
+// For now build cosmos (mode 0) geometry
+var PITCH = 0.38;  // log spiral pitch
+var RS    = 0.08;  // inner radius
+var SCALE = 2.8;   // world units for galaxy radius
+
+var positions = new Float32Array(N*3);
+var colors    = new Float32Array(N*3);
+var sizes     = new Float32Array(N);
+
+// Distribution: 72% arms, 13% bulge, 10% bg stars, 5% halo
+var nArm   = Math.floor(N*0.72);
+var nBulge = Math.floor(N*0.13);
+var nBg    = Math.floor(N*0.10);
+var nHalo  = N - nArm - nBulge - nBg;
+
+var idx = 0;
+
+// ── Arm particles ──
+for(var i=0;i<nArm;i++){
+  // t: position along arm (0=inner, 1=outer)
+  var t = Math.pow(Math.random(), 0.6);
+  var r = 0.08 + t * 0.92;  // normalized radius 0.08..1.0
+
+  // 2 main arms + 2 minor arms
+  var armSeed = Math.random();
+  var armBase, isMajor;
+  if(armSeed < 0.42){armBase=0; isMajor=true;}
+  else if(armSeed < 0.84){armBase=Math.PI; isMajor=true;}
+  else if(armSeed < 0.92){armBase=Math.PI*0.5; isMajor=false;}
+  else{armBase=Math.PI*1.5; isMajor=false;}
+
+  var spiralAngle = armBase + Math.log(r/RS)/PITCH;
+
+  // Cross-section scatter (Gaussian, tighter near center)
+  var sigma = (isMajor?0.042:0.028) + t*(isMajor?0.13:0.075);
+  var dx = gauss(sigma);
+  var dz = gauss(sigma*0.7);
+  var dy = gauss(0.012 + t*0.018);  // very thin disk
+
+  var wx = r*SCALE*Math.cos(spiralAngle) + dx*SCALE;
+  var wy = dy*SCALE;
+  var wz = r*SCALE*Math.sin(spiralAngle) + dz*SCALE;
+
+  positions[idx*3]   = wx;
+  positions[idx*3+1] = wy;
+  positions[idx*3+2] = wz;
+
+  // Color: on-arm brighter, off-arm dimmer
+  var offAxis = Math.min(Math.abs(dx)/sigma, 1);
+  var c = galColor(r);
+  var boost = 0.45 + (1-offAxis)*0.7;
+  colors[idx*3]   = Math.min(c[0]*boost + Math.random()*0.04, 1);
+  colors[idx*3+1] = Math.min(c[1]*boost + Math.random()*0.03, 1);
+  colors[idx*3+2] = Math.min(c[2]*boost + Math.random()*0.04, 1);
+
+  // Size: inner arm particles slightly larger
+  sizes[idx] = (0.055 + Math.random()*0.085) * (1 - t*0.25) * (isMajor?1:0.72);
+  idx++;
+}
+
+// ── Bulge particles ──
+for(var i=0;i<nBulge;i++){
+  var r2 = Math.pow(Math.random(),1.8)*0.45*SCALE;
+  var th2 = Math.random()*TAU;
+  var ph2 = gauss(1)*0.6;
+  positions[idx*3]   = r2*Math.cos(th2)*Math.cos(ph2);
+  positions[idx*3+1] = r2*Math.sin(ph2)*0.4;
+  positions[idx*3+2] = r2*Math.sin(th2)*Math.cos(ph2);
+
+  var b = 1 - r2/(0.45*SCALE);
+  colors[idx*3]   = Math.min(0.95+b*0.05+Math.random()*0.03, 1);
+  colors[idx*3+1] = Math.min(0.80+b*0.12+Math.random()*0.03, 1);
+  colors[idx*3+2] = Math.min(0.45+b*0.20+Math.random()*0.03, 1);
+  sizes[idx] = 0.045 + Math.random()*0.075;
+  idx++;
+}
+
+// ── Background stars ──
+for(var i=0;i<nBg;i++){
+  var r3 = 4 + Math.pow(Math.random(),0.5)*10;
+  var th3 = Math.random()*TAU;
+  var ph3 = (Math.random()-0.5)*Math.PI;
+  positions[idx*3]   = r3*Math.cos(th3)*Math.cos(ph3);
+  positions[idx*3+1] = r3*Math.sin(ph3)*0.5;
+  positions[idx*3+2] = r3*Math.sin(th3)*Math.cos(ph3);
+
+  var v = Math.random();
+  if(v<0.30){colors[idx*3]=1;colors[idx*3+1]=0.88;colors[idx*3+2]=0.55;}
+  else if(v<0.60){colors[idx*3]=0.70;colors[idx*3+1]=0.82;colors[idx*3+2]=1;}
+  else{colors[idx*3]=1;colors[idx*3+1]=1;colors[idx*3+2]=1;}
+  sizes[idx] = 0.035 + Math.random()*0.09;
+  idx++;
+}
+
+// ── Halo ──
+for(var i=0;i<nHalo;i++){
+  var r4 = 8 + Math.random()*8;
+  var th4 = Math.random()*TAU;
+  var ph4 = (Math.random()-0.5)*Math.PI;
+  positions[idx*3]   = r4*Math.cos(th4)*Math.cos(ph4);
+  positions[idx*3+1] = r4*Math.sin(ph4);
+  positions[idx*3+2] = r4*Math.sin(th4)*Math.cos(ph4);
+  colors[idx*3]=0.28; colors[idx*3+1]=0.22; colors[idx*3+2]=0.52;
+  sizes[idx] = 0.025 + Math.random()*0.05;
+  idx++;
+}
+
+// ── Textures ──
+function makeCircTex(){
+  var c=document.createElement('canvas'); c.width=c.height=64;
+  var ctx=c.getContext('2d');
+  var g=ctx.createRadialGradient(32,32,0,32,32,32);
+  g.addColorStop(0,'rgba(255,255,255,1)');
+  g.addColorStop(0.20,'rgba(255,255,255,.95)');
+  g.addColorStop(0.50,'rgba(255,255,255,.45)');
+  g.addColorStop(0.80,'rgba(255,255,255,.10)');
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,64,64);
+  return new THREE.CanvasTexture(c);
+}
+function makeStarTex(){
+  var c=document.createElement('canvas'); c.width=c.height=64;
+  var ctx=c.getContext('2d');
+  // Glow base
+  var g=ctx.createRadialGradient(32,32,0,32,32,24);
+  g.addColorStop(0,'rgba(255,255,255,.95)');
+  g.addColorStop(0.4,'rgba(255,255,255,.4)');
+  g.addColorStop(1,'rgba(255,255,255,0)');
+  ctx.fillStyle=g; ctx.beginPath(); ctx.arc(32,32,24,0,TAU); ctx.fill();
+  // 4 spikes
+  ctx.fillStyle='rgba(255,255,255,.9)';
+  for(var a=0;a<4;a++){
+    ctx.save(); ctx.translate(32,32); ctx.rotate(a*Math.PI/2);
+    ctx.beginPath();
+    ctx.moveTo(0,-30);
+    ctx.quadraticCurveTo(4,-4,0,0);
+    ctx.quadraticCurveTo(-4,-4,0,-30);
+    ctx.fill(); ctx.restore();
+  }
+  return new THREE.CanvasTexture(c);
+}
+
+var circTex = makeCircTex();
+var starTex  = makeStarTex();
+
+// ── Shader material — circles ──
+var VS = [
+'attribute float size;',
+'attribute vec3 aColor;',
+'uniform float uTime;',
+'uniform float uCollapse;',
+'uniform float uBeat;',
+'varying vec3 vColor;',
+'varying float vAlpha;',
+'void main(){',
+'  vec3 pos = position;',
+// Gentle breathing
+'  float breath = sin(uTime*0.22 + position.x*0.15 + position.z*0.12)*0.008;',
+'  pos.y += breath;',
+// Collapse: pull to center
+'  if(uCollapse>0.0){',
+'    pos = mix(pos, pos*0.08, uCollapse*uCollapse*0.7);',
+'    float sw = uCollapse*12.56;',
+'    float ox=pos.x, oz=pos.z;',
+'    pos.x = ox*cos(sw)-oz*sin(sw);',
+'    pos.z = ox*sin(sw)+oz*cos(sw);',
+'  }',
+'  vec4 mv = modelViewMatrix * vec4(pos, 1.0);',
+'  float dist = -mv.z;',
+'  gl_PointSize = size * (200.0/dist);',
+'  gl_PointSize = clamp(gl_PointSize, 0.4, 5.0);',
+'  vAlpha = clamp(size*8.0 + 0.08, 0.0, 0.72) * (1.0-uCollapse*0.5);',
+'  vColor = aColor * (1.0 + uBeat*0.15);',
+'  gl_Position = projectionMatrix * mv;',
+'}'
+].join('\n');
+
+var FS_CIRC = [
+'precision highp float;',
+'uniform sampler2D uTex;',
+'varying vec3 vColor;',
+'varying float vAlpha;',
+'void main(){',
+'  float a = texture2D(uTex, gl_PointCoord).r;',
+'  if(a < 0.01) discard;',
+'  gl_FragColor = vec4(vColor, a*vAlpha);',
+'}'
+].join('\n');
+
+var FS_STAR = [
+'precision highp float;',
+'uniform sampler2D uTex;',
+'varying vec3 vColor;',
+'varying float vAlpha;',
+'void main(){',
+'  float a = texture2D(uTex, gl_PointCoord).r;',
+'  if(a < 0.01) discard;',
+'  gl_FragColor = vec4(vColor, a*vAlpha*1.3);',
+'}'
+].join('\n');
+
+function makePoints(tex, fsCode, nFrom, nTo){
+  var geo = new THREE.BufferGeometry();
+  var pos2 = positions.slice(nFrom*3, nTo*3);
+  var col2 = colors.slice(nFrom*3, nTo*3);
+  var sz2  = sizes.slice(nFrom, nTo);
+  geo.setAttribute('position', new THREE.BufferAttribute(pos2, 3));
+  geo.setAttribute('aColor',   new THREE.BufferAttribute(col2, 3));
+  geo.setAttribute('size',     new THREE.BufferAttribute(sz2, 1));
+  var mat = new THREE.ShaderMaterial({
+    uniforms:{uTex:{value:tex},uTime:{value:0},uCollapse:{value:0},uBeat:{value:0}},
+    vertexShader:VS, fragmentShader:fsCode,
+    transparent:true, blending:THREE.AdditiveBlending,
+    depthWrite:false, depthTest:false
+  });
+  return new THREE.Points(geo, mat);
+}
+
+// Split: 35% of arm particles get star texture, rest circles
+var armStarCut = Math.floor(nArm*0.35);
+var bulgeStarCut = Math.floor(nBulge*0.45);
+
+// Circles: most arm, most bulge, bg, halo
+var ptArmCirc  = makePoints(circTex, FS_CIRC, armStarCut, nArm);
+var ptBulgeC   = makePoints(circTex, FS_CIRC, nArm+bulgeStarCut, nArm+nBulge);
+var ptBg       = makePoints(circTex, FS_CIRC, nArm+nBulge, nArm+nBulge+nBg);
+var ptHalo     = makePoints(circTex, FS_CIRC, nArm+nBulge+nBg, N);
+// Stars: bright inner arm particles, bright bulge
+var ptArmStar  = makePoints(starTex, FS_STAR, 0, armStarCut);
+var ptBulgeS   = makePoints(starTex, FS_STAR, nArm, nArm+bulgeStarCut);
+var ptBgStar   = makePoints(starTex, FS_STAR, nArm+nBulge, nArm+nBulge+Math.floor(nBg*0.5));
+
+var galaxy = new THREE.Group();
+galaxy.add(ptArmCirc, ptArmStar, ptBulgeC, ptBulgeS, ptBg, ptBgStar, ptHalo);
+scene.add(galaxy);
+
+// ── Photon: 珏然 (gold) and 田野 (blue) ──
+// These are sprite objects that follow the mouse
+function makePhoton(color, glowColor){
+  var c=document.createElement('canvas'); c.width=c.height=128;
+  var ctx=c.getContext('2d');
+  // Outer glow
+  var g=ctx.createRadialGradient(64,64,0,64,64,64);
+  g.addColorStop(0,'rgba('+glowColor+',1)');
+  g.addColorStop(0.12,'rgba('+glowColor+',.85)');
+  g.addColorStop(0.35,'rgba('+glowColor+',.35)');
+  g.addColorStop(0.65,'rgba('+glowColor+',.08)');
+  g.addColorStop(1,'rgba('+glowColor+',0)');
+  ctx.fillStyle=g; ctx.fillRect(0,0,128,128);
+  // Bright core
+  var g2=ctx.createRadialGradient(64,64,0,64,64,18);
+  g2.addColorStop(0,'rgba(255,255,255,1)');
+  g2.addColorStop(0.4,'rgba('+glowColor+',.9)');
+  g2.addColorStop(1,'rgba('+glowColor+',0)');
+  ctx.fillStyle=g2; ctx.beginPath(); ctx.arc(64,64,18,0,Math.PI*2); ctx.fill();
+  var tex=new THREE.CanvasTexture(c);
+  var mat=new THREE.SpriteMaterial({map:tex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false});
+  var sprite=new THREE.Sprite(mat);
+  sprite.scale.set(0.6,0.6,1);
+  return sprite;
+}
+
+var photonA = makePhoton('blue','80,160,255');    // 珏然
+var photonB = makePhoton('green','80,220,120');   // 田野
+scene.add(photonA);
+scene.add(photonB);
+
+// Target positions for photons
+var photonATarget = new THREE.Vector3(-0.8, 0, 0);
+var photonBTarget = new THREE.Vector3( 0.8, 0, 0);
+var photonAPos    = new THREE.Vector3(-0.8, 0, 0);
+var photonBPos    = new THREE.Vector3( 0.8, 0, 0);
+
+
+var allPts = [ptArmCirc,ptArmStar,ptBulgeC,ptBulgeS,ptBg,ptBgStar,ptHalo];
+
+// ── Resize ──
+function resize(){
+  W=innerWidth; H=innerHeight;
+  renderer.setSize(W,H);
+  camera.aspect=W/H; camera.updateProjectionMatrix();
+}
+resize(); window.addEventListener('resize',resize);
+
+// ── Audio ──
+function initAudio(){
+  if(aRdy)return;
+  aCtx=new(window.AudioContext||window.webkitAudioContext)();
+  mGain=aCtx.createGain(); mGain.gain.value=0; mGain.connect(aCtx.destination);
+  // Reverb
+  var rl=aCtx.sampleRate*3.5, rb=aCtx.createBuffer(2,rl,aCtx.sampleRate);
+  for(var ch=0;ch<2;ch++){var d=rb.getChannelData(ch);for(var j=0;j<rl;j++)d[j]=(Math.random()*2-1)*Math.pow(1-j/rl,1.8);}
+  var rev=aCtx.createConvolver(); rev.buffer=rb;
+  var rg=aCtx.createGain(); rg.gain.value=0.42; rev.connect(rg); rg.connect(mGain);
+  var filt=aCtx.createBiquadFilter(); filt.type='lowpass'; filt.frequency.value=950; filt.Q.value=0.65;
+  filt.connect(mGain); filt.connect(rev);
+  [{f:213.5,a:.055},{f:427,a:.13},{f:427.18,a:.048},{f:426.82,a:.048},
+   {f:640.5,a:.026},{f:854,a:.032},{f:1068.5,a:.018},{f:1281,a:.013}
+  ].forEach(function(o){
+    var osc=aCtx.createOscillator(),g=aCtx.createGain();
+    osc.type='sine'; osc.frequency.value=o.f; g.gain.value=o.a;
+    osc.connect(g); g.connect(filt); osc.start();
+    oscs.push({osc:osc,g:g,f0:o.f,a0:o.a});
+  });
+  var pl=aCtx.createOscillator(),pg=aCtx.createGain();
+  pl.frequency.value=0.08; pg.gain.value=210; pl.connect(pg); pg.connect(filt.frequency); pl.start();
+  var lfo=aCtx.createOscillator(),lg=aCtx.createGain();
+  lfo.frequency.value=4.27; lg.gain.value=0.24; lfo.connect(lg);
+  if(oscs[1])lg.connect(oscs[1].osc.frequency);
+  if(oscs[2])lg.connect(oscs[2].osc.frequency);
+  lfo.start();
+  var tr=aCtx.createOscillator(),tg=aCtx.createGain(),tb=aCtx.createGain();
+  tr.frequency.value=0.13; tg.gain.value=0.09; tb.gain.value=0.91;
+  tr.connect(tg); tg.connect(tb.gain); tb.connect(mGain); tr.start();
+  aRdy=true;
+  console.log('%c 44271_PROTOCOL_LOADED ','background:#110022;color:#b49bff;font-weight:bold');
+}
+var MCFG=[{f:1,a:1},{f:1.001,a:.70},{f:.999,a:.80},{f:1.004,a:1.10}];
+function setAudioMode(m){
+  if(!aRdy)return;
+  var c=MCFG[m],n=aCtx.currentTime;
+  oscs.forEach(function(o){
+    o.osc.frequency.linearRampToValueAtTime(o.f0*c.f,n+2.5);
+    o.g.gain.linearRampToValueAtTime(o.a0*c.a,n+2.5);
+  });
+}
+function toggleAudio(){
+  initAudio(); aOn=!aOn;
+  var n=aCtx.currentTime;
+  mGain.gain.cancelScheduledValues(n);
+  mGain.gain.linearRampToValueAtTime(aOn?0.086:0,n+1.5);
+  document.getElementById('snd').classList.toggle('on',aOn);
+  if(aOn)setAudioMode(mode);
+}
+document.getElementById('snd').addEventListener('click',toggleAudio);
+
+// ── Render loop ──
+var euler = new THREE.Euler(0,0,0,'YXZ');
+function loop(now){
+  requestAnimationFrame(loop);
+  var dt=Math.min((now-last)*.001,.05); last=now; el+=dt;
+  smx+=(mnx-smx)*.05; smy+=(mny-smy)*.05;
+  vRX*=.91; vRY*=.91;
+  if(!drag) vRY+=0.00008;
+  rotX+=vRX; rotY+=vRY;
+  rotX=Math.max(-.48,Math.min(.48,rotX));
+
+  if(pT&&performance.now()-pT>480) isCol=true;
+  if(isCol) colR=Math.min(colR+dt*.85,1.);
+  else      colR=Math.max(colR-dt*1.7,0.);
+
+  var bRaw=Math.pow(Math.max(Math.sin(el*1.4*TAU),0),5);
+  bEnv+=(bRaw-bEnv)*.1;
+
+  if(aRdy&&aOn){
+    var n2=aCtx.currentTime, fm=1+colR*.14+bEnv*.007;
+    oscs.forEach(function(o){o.osc.frequency.setTargetAtTime(o.f0*fm,n2,.08);});
+    mGain.gain.setTargetAtTime(0.086+colR*.04+bEnv*.005,n2,.08);
+  }
+
+  // (galaxy rotation handled in photon section above)
+
+  // Camera parallax
+  camera.position.x = smx*0.06;
+  camera.position.y = smy*0.04 + 0.3;
+  camera.lookAt(0,0,0);
+
+  // ── Absolute gravity photons ──
+  var mw = new THREE.Vector3(smx*2.4, smy*1.8, 0);
+  // 珏然 (蓝) — absolute gravity to cursor
+  photonATarget.copy(mw);
+  photonAPos.lerp(photonATarget, 0.12);
+  // 田野 (绿) — orbits cursor with slight lag
+  var orbitAngle = el*1.1;
+  photonBTarget.set(
+    mw.x + Math.cos(orbitAngle)*0.22,
+    mw.y + Math.sin(orbitAngle)*0.16,
+    Math.sin(orbitAngle*0.7)*0.12
+  );
+  photonBPos.lerp(photonBTarget, 0.07);
+  photonA.position.copy(photonAPos);
+  photonB.position.copy(photonBPos);
+  // Pulse
+  var pulse = 0.55 + bEnv*0.3 + Math.sin(el*2.1)*0.07;
+  photonA.scale.set(pulse*0.70, pulse*0.70, 1);
+  photonB.scale.set(pulse*0.60, pulse*0.60, 1);
+
+  // ── Galaxy responds to mouse ──
+  // Warp: galaxy rotation influenced by mouse position
+  // smx tilts the galaxy slightly, smy shifts viewing angle
+  var mouseInfluence = 0.18;
+  galaxy.rotation.x = rotX + smy * mouseInfluence;
+  galaxy.rotation.y = rotY + el*0.055 + smx * mouseInfluence * 0.5;
+
+  // Update uniforms
+  allPts.forEach(function(p){
+    p.material.uniforms.uTime.value    = el;
+    p.material.uniforms.uCollapse.value= colR;
+    p.material.uniforms.uBeat.value    = bEnv;
+  });
+
+  renderer.render(scene,camera);
+
+  // Collapse filter
+  if(colR>.01){
+    renderer.domElement.style.filter='contrast('+(100+colR*35)+'%) saturate('+(108+colR*55)+'%)';
+    var s=1+colR*1.5;
+    cur.style.width=(4*s)+'px'; cur.style.height=(4*s)+'px';
+    cur2.style.width=(20+colR*20)+'px'; cur2.style.height=(20+colR*20)+'px';
+    cur2.style.borderColor='rgba(180,140,255,'+(0.15+colR*.3)+')';
+  } else {
+    renderer.domElement.style.filter='none';
+    cur.style.width='4px'; cur.style.height='4px';
+    cur2.style.width='20px'; cur2.style.height='20px';
+    cur2.style.borderColor='rgba(200,170,255,.15)';
+  }
+}
+requestAnimationFrame(loop);
+}());
+</script>
 </body>
 </html>
