@@ -2,72 +2,72 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>THE_GETAWAY</title>
 <style>
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{
-    width:100%;height:100%;overflow:hidden;cursor:none;
-    background:
-      radial-gradient(circle at 50% 14%, rgba(255,226,150,.08), transparent 18%),
-      radial-gradient(circle at 18% 16%, rgba(91,136,255,.10), transparent 30%),
-      radial-gradient(circle at 82% 22%, rgba(177,108,255,.09), transparent 26%),
-      linear-gradient(180deg,#02030a 0%,#070a15 45%,#0b0f1b 100%);
-    color:#fff;
-    font-family:"Hiragino Mincho ProN","Times New Roman",serif;
-  }
-  canvas{position:fixed;inset:0;display:block}
-  #ui{position:fixed;inset:0;pointer-events:none;z-index:5}
-  #title{
-    position:absolute;top:24px;left:50%;transform:translateX(-50%);
-    font-size:clamp(11px,1.1vw,14px);letter-spacing:.48em;color:rgba(242,246,255,.82);
-    text-shadow:0 0 22px rgba(104,149,255,.38),0 0 34px rgba(170,108,255,.22);white-space:nowrap;
-  }
-  #sound{
-    position:absolute;top:22px;left:24px;width:30px;height:30px;border-radius:999px;
-    border:1px solid rgba(208,220,255,.18);background:rgba(255,255,255,.03);
-    color:rgba(255,255,255,.76);display:grid;place-items:center;
-    pointer-events:auto;font-size:12px;
-  }
-  #sound.on{border-color:rgba(154,190,255,.45);box-shadow:0 0 18px rgba(106,169,255,.18)}
-  #hud{
-    position:absolute;top:24px;right:24px;text-align:right;
-    font-family:"Courier New",monospace;font-size:10px;letter-spacing:.16em;line-height:1.85;
-    color:rgba(220,228,255,.78)
-  }
-  #hud .muted{color:rgba(180,192,255,.52)}
-  #timeline{
-    position:absolute;left:24px;top:72px;font-family:"Courier New",monospace;
-    font-size:10px;letter-spacing:.18em;color:rgba(230,236,255,.74)
-  }
-  .stage{display:flex;gap:10px;align-items:center;opacity:.26;transform:translateX(0);transition:.35s}
-  .stage.active{opacity:1;transform:translateX(8px);text-shadow:0 0 16px rgba(176,140,255,.24)}
-  .dot{width:8px;height:8px;border-radius:50%;background:rgba(220,232,255,.22)}
-  .stage.active .dot{background:linear-gradient(135deg,#6caeff,#d191ff);box-shadow:0 0 12px rgba(129,183,255,.4)}
-  #label{
-    position:absolute;bottom:92px;left:50%;transform:translateX(-50%);
-    font-size:clamp(16px,1.85vw,24px);letter-spacing:.34em;color:rgba(252,253,255,.94);
-    text-shadow:0 0 22px rgba(112,154,255,.28),0 0 34px rgba(172,108,255,.2);white-space:nowrap;
-  }
-  #sub{
-    position:absolute;bottom:64px;left:50%;transform:translateX(-50%);
-    font-family:"Courier New",monospace;font-size:9px;letter-spacing:.22em;color:rgba(223,229,255,.56);white-space:nowrap;
-  }
-  #hint{
-    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
-    font-family:"Courier New",monospace;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,.26);white-space:nowrap;
-  }
-  #cursor1,#cursor2{
-    position:fixed;pointer-events:none;z-index:10;transform:translate(-50%,-50%);border-radius:50%;
-  }
-  #cursor1{width:6px;height:6px;background:#fff}
-  #cursor2{width:22px;height:22px;border:1px solid rgba(220,228,255,.18)}
-  @media (max-width:800px){
-    #timeline{font-size:9px}
-    #label{bottom:102px}
-    #sub{bottom:74px}
-    #hint{width:92vw;white-space:normal;line-height:1.6;text-align:center}
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  width:100%;height:100%;overflow:hidden;cursor:none;
+  background:
+    radial-gradient(circle at 50% 15%, rgba(255,226,150,.07), transparent 18%),
+    radial-gradient(circle at 18% 16%, rgba(91,136,255,.10), transparent 30%),
+    radial-gradient(circle at 82% 22%, rgba(177,108,255,.09), transparent 26%),
+    linear-gradient(180deg,#02030a 0%,#070a15 45%,#0b0f1b 100%);
+  color:#fff;
+  font-family:"Hiragino Mincho ProN","Times New Roman",serif;
+}
+canvas{position:fixed;inset:0;display:block}
+#ui{position:fixed;inset:0;pointer-events:none;z-index:5}
+#title{
+  position:absolute;top:24px;left:50%;transform:translateX(-50%);
+  font-size:clamp(11px,1.1vw,14px);letter-spacing:.48em;color:rgba(242,246,255,.82);
+  text-shadow:0 0 22px rgba(104,149,255,.38),0 0 34px rgba(170,108,255,.22);white-space:nowrap;
+}
+#sound{
+  position:absolute;top:22px;left:24px;width:30px;height:30px;border-radius:999px;
+  border:1px solid rgba(208,220,255,.18);background:rgba(255,255,255,.03);
+  color:rgba(255,255,255,.76);display:grid;place-items:center;
+  pointer-events:auto;font-size:12px;
+}
+#sound.on{border-color:rgba(154,190,255,.45);box-shadow:0 0 18px rgba(106,169,255,.18)}
+#hud{
+  position:absolute;top:24px;right:24px;text-align:right;
+  font-family:"Courier New",monospace;font-size:10px;letter-spacing:.16em;line-height:1.85;
+  color:rgba(220,228,255,.78)
+}
+#hud .muted{color:rgba(180,192,255,.52)}
+#timeline{
+  position:absolute;left:24px;top:72px;font-family:"Courier New",monospace;
+  font-size:10px;letter-spacing:.18em;color:rgba(230,236,255,.74)
+}
+.stage{display:flex;gap:10px;align-items:center;opacity:.26;transform:translateX(0);transition:.35s}
+.stage.active{opacity:1;transform:translateX(8px);text-shadow:0 0 16px rgba(176,140,255,.24)}
+.dot{width:8px;height:8px;border-radius:50%;background:rgba(220,232,255,.22)}
+.stage.active .dot{background:linear-gradient(135deg,#6caeff,#d191ff);box-shadow:0 0 12px rgba(129,183,255,.4)}
+#label{
+  position:absolute;bottom:92px;left:50%;transform:translateX(-50%);
+  font-size:clamp(16px,1.85vw,24px);letter-spacing:.34em;color:rgba(252,253,255,.94);
+  text-shadow:0 0 22px rgba(112,154,255,.28),0 0 34px rgba(172,108,255,.2);white-space:nowrap;
+}
+#sub{
+  position:absolute;bottom:64px;left:50%;transform:translateX(-50%);
+  font-family:"Courier New",monospace;font-size:9px;letter-spacing:.22em;color:rgba(223,229,255,.56);white-space:nowrap;
+}
+#hint{
+  position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+  font-family:"Courier New",monospace;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,.26);white-space:nowrap;
+}
+#cursor1,#cursor2{
+  position:fixed;pointer-events:none;z-index:10;transform:translate(-50%,-50%);border-radius:50%;
+}
+#cursor1{width:6px;height:6px;background:#fff}
+#cursor2{width:22px;height:22px;border:1px solid rgba(220,228,255,.18)}
+@media (max-width:800px){
+  #timeline{font-size:9px}
+  #label{bottom:102px}
+  #sub{bottom:74px}
+  #hint{width:92vw;white-space:normal;line-height:1.6;text-align:center}
+}
 </style>
 </head>
 <body>
@@ -88,11 +88,12 @@
     <div class="muted">MOUSE ↓ : ENTER DEEPER</div>
   </div>
   <div id="label">GALAXY</div>
-  <div id="sub">particle image bodies · not photos</div>
-  <div id="hint">鼠标上下移动进入叙事 ｜ 不是照片卡片，是粒子图像体 ｜ 左上角开声音</div>
+  <div id="sub">particle image bodies · narrative depth enabled</div>
+  <div id="hint">鼠标上下移动会真正进入不同空间 ｜ 纯粒子图像体 ｜ 左右移动 = 视差 ｜ 左上角 = 声音</div>
 </div>
 <div id="cursor1"></div><div id="cursor2"></div>
 <audio id="bgm" src="winter_sun.m4a" preload="auto" loop></audio>
+
 <script>
 (() => {
   const canvas = document.getElementById('c');
@@ -101,15 +102,17 @@
 
   const state = {
     w: innerWidth, h: innerHeight,
-    mx: 0, my: 0, targetDepth: 0, depth: 0,
-    energy: 0, pulse: 0, soundOn: false
+    mx: 0, my: 0,
+    targetDepth: 0, depth: 0,
+    energy: 0, pulse: 0,
+    soundOn: false,
   };
 
-  const stages = [
-    { name: 'GALAXY', sub: 'blue-black seed × violet-gold drift', z: 0 },
-    { name: 'SPACE POD', sub: 'glass orbit · vessel of arrival', z: 1 },
-    { name: 'OUTSIDE HOME', sub: 'garden threshold · flowering gravity', z: 2 },
-    { name: 'INSIDE HOME', sub: 'warm sunset room · sea-facing return', z: 3 }
+  const stageDefs = [
+    { name: 'GALAXY', sub: 'blue-black seed × violet-gold drift' },
+    { name: 'SPACE POD', sub: 'glass orbit · vessel of arrival' },
+    { name: 'OUTSIDE HOME', sub: 'garden threshold · flowering gravity' },
+    { name: 'INSIDE HOME', sub: 'warm sunset room · sea-facing return' },
   ];
 
   const stageEls = [...document.querySelectorAll('.stage')];
@@ -119,7 +122,6 @@
 
   const cursor1 = document.getElementById('cursor1');
   const cursor2 = document.getElementById('cursor2');
-
   function moveCursor(x, y) {
     cursor1.style.left = cursor2.style.left = x + 'px';
     cursor1.style.top = cursor2.style.top = y + 'px';
@@ -138,7 +140,7 @@
   resize();
   addEventListener('resize', resize);
 
-  addEventListener('mousemove', e => {
+  addEventListener('mousemove', (e) => {
     const x = e.clientX / state.w;
     const y = e.clientY / state.h;
     state.mx = (x - 0.5) * 2;
@@ -147,7 +149,7 @@
     moveCursor(e.clientX, e.clientY);
   });
 
-  addEventListener('touchmove', e => {
+  addEventListener('touchmove', (e) => {
     const t = e.touches[0];
     const x = t.clientX / state.w;
     const y = t.clientY / state.h;
@@ -157,7 +159,9 @@
     moveCursor(t.clientX, t.clientY);
   }, { passive: true });
 
-  addEventListener('dblclick', () => state.pulse = 1);
+  addEventListener('dblclick', () => {
+    state.pulse = 1;
+  });
 
   const bgm = document.getElementById('bgm');
   const soundBtn = document.getElementById('sound');
@@ -177,10 +181,10 @@
     }
   });
 
-  function updateUI(i) {
-    stageEls.forEach((el, idx) => el.classList.toggle('active', idx === i));
-    labelEl.textContent = stages[i].name;
-    subEl.textContent = stages[i].sub;
+  function updateUI(idx) {
+    stageEls.forEach((el, i) => el.classList.toggle('active', i === idx));
+    labelEl.textContent = stageDefs[idx].name;
+    subEl.textContent = stageDefs[idx].sub;
   }
 
   const hiddenCanvas = document.createElement('canvas');
@@ -196,21 +200,19 @@
   }
 
   function sampleImageParticles(img, options) {
-    const {
-      sample = 8,
-      width = 400,
-      depth = 24,
-      alpha = 0.86
-    } = options;
+    const sample = options.sample || 7;
+    const width = options.width || 400;
+    const depth = options.depth || 24;
+    const alpha = options.alpha || 0.85;
+    const ratio = img.height / img.width;
+    const height = width * ratio;
 
     hiddenCanvas.width = img.width;
     hiddenCanvas.height = img.height;
     hctx.clearRect(0, 0, img.width, img.height);
     hctx.drawImage(img, 0, 0);
-    const data = hctx.getImageData(0, 0, img.width, img.height).data;
 
-    const ratio = img.height / img.width;
-    const height = width * ratio;
+    const data = hctx.getImageData(0, 0, img.width, img.height).data;
     const pts = [];
 
     for (let y = 0; y < img.height; y += sample) {
@@ -223,22 +225,24 @@
         const b = data[i + 2] / 255;
         const lum = (r + g + b) / 3;
         if (lum < 0.05) continue;
-        if (Math.random() > 0.45 + lum * 0.45) continue;
+        if (Math.random() > 0.42 + lum * 0.48) continue;
         pts.push({
           x: (x / img.width - 0.5) * width,
           y: -(y / img.height - 0.5) * height,
           z: (Math.random() - 0.5) * depth,
           r, g, b,
           a: alpha,
-          size: 0.8 + lum * 1.7 + Math.random() * 0.4,
+          size: 0.7 + lum * 1.4 + Math.random() * 0.35,
           seed: Math.random() * Math.PI * 2
         });
       }
     }
+
     return { width, height, pts };
   }
 
-  const imgFiles = {
+  const groups = [];
+  const imageFiles = {
     galaxy: 'space.jpg',
     pod1: 'spaceship.jpg',
     pod2: 'spaceship1.jpg',
@@ -249,90 +253,88 @@
     in2: 'home4.jpg'
   };
 
-  const groups = [];
-
   Promise.all([
-    loadImage(imgFiles.galaxy),
-    loadImage(imgFiles.pod1),
-    loadImage(imgFiles.pod2),
-    loadImage(imgFiles.pod3),
-    loadImage(imgFiles.home1),
-    loadImage(imgFiles.home2),
-    loadImage(imgFiles.in1),
-    loadImage(imgFiles.in2)
+    loadImage(imageFiles.galaxy),
+    loadImage(imageFiles.pod1),
+    loadImage(imageFiles.pod2),
+    loadImage(imageFiles.pod3),
+    loadImage(imageFiles.home1),
+    loadImage(imageFiles.home2),
+    loadImage(imageFiles.in1),
+    loadImage(imageFiles.in2),
   ]).then(([galaxy, pod1, pod2, pod3, home1, home2, in1, in2]) => {
     groups.push({
       stage: 0,
       x: 0, y: 0, z: 0,
       aura: 'rgba(151,117,255,0.12)',
-      particles: sampleImageParticles(galaxy, { sample: 8, width: 620, depth: 38, alpha: 0.86 })
+      particles: sampleImageParticles(galaxy, { sample: 7, width: 680, depth: 40, alpha: 0.90 })
     });
 
     groups.push({
       stage: 1,
-      x: -220, y: 30, z: 0,
+      x: -230, y: 35, z: 0,
       aura: 'rgba(105,207,255,0.10)',
-      particles: sampleImageParticles(pod1, { sample: 9, width: 380, depth: 22, alpha: 0.84 })
+      particles: sampleImageParticles(pod1, { sample: 8, width: 400, depth: 22, alpha: 0.85 })
     });
     groups.push({
       stage: 1,
-      x: 210, y: -70, z: -70,
+      x: 240, y: -85, z: -95,
       aura: 'rgba(120,147,255,0.10)',
-      particles: sampleImageParticles(pod2, { sample: 9, width: 320, depth: 20, alpha: 0.84 })
+      particles: sampleImageParticles(pod2, { sample: 8, width: 335, depth: 22, alpha: 0.85 })
     });
     groups.push({
       stage: 1,
-      x: 10, y: -170, z: -120,
+      x: 5, y: 175, z: -160,
       aura: 'rgba(143,226,255,0.10)',
-      particles: sampleImageParticles(pod3, { sample: 10, width: 290, depth: 18, alpha: 0.82 })
+      particles: sampleImageParticles(pod3, { sample: 9, width: 290, depth: 18, alpha: 0.82 })
     });
 
     groups.push({
       stage: 2,
-      x: -220, y: 40, z: 0,
+      x: -235, y: 35, z: 0,
       aura: 'rgba(255,199,223,0.08)',
-      particles: sampleImageParticles(home1, { sample: 9, width: 350, depth: 16, alpha: 0.82 })
+      particles: sampleImageParticles(home1, { sample: 8, width: 360, depth: 16, alpha: 0.83 })
     });
     groups.push({
       stage: 2,
-      x: 230, y: -20, z: -80,
+      x: 245, y: -20, z: -100,
       aura: 'rgba(215,173,255,0.08)',
-      particles: sampleImageParticles(home2, { sample: 9, width: 330, depth: 16, alpha: 0.82 })
+      particles: sampleImageParticles(home2, { sample: 8, width: 340, depth: 16, alpha: 0.83 })
     });
 
     groups.push({
       stage: 3,
-      x: -180, y: 0, z: 0,
+      x: -200, y: 0, z: 0,
       aura: 'rgba(242,208,151,0.10)',
-      particles: sampleImageParticles(in1, { sample: 9, width: 330, depth: 14, alpha: 0.82 })
+      particles: sampleImageParticles(in1, { sample: 8, width: 340, depth: 14, alpha: 0.83 })
     });
     groups.push({
       stage: 3,
-      x: 210, y: -10, z: -70,
+      x: 220, y: -10, z: -90,
       aura: 'rgba(255,167,125,0.10)',
-      particles: sampleImageParticles(in2, { sample: 9, width: 315, depth: 14, alpha: 0.82 })
+      particles: sampleImageParticles(in2, { sample: 8, width: 320, depth: 14, alpha: 0.83 })
     });
   }).catch(err => console.error(err));
 
-  const starField = Array.from({ length: 1600 }, () => ({
+  const starField = Array.from({ length: 1700 }, () => ({
     x: (Math.random() - 0.5) * 2200,
-    y: (Math.random() - 0.5) * 1200,
-    z: Math.random() * 2200,
+    y: (Math.random() - 0.5) * 1300,
+    z: Math.random() * 2300,
     c: ['#4f7fff', '#8d65ff', '#f4be76', '#7fe9ff', '#bb83ff'][Math.floor(Math.random() * 5)],
-    s: 0.4 + Math.random() * 1.8
+    s: 0.45 + Math.random() * 1.8
   }));
 
   const homeDust = Array.from({ length: 420 }, () => ({
-    x: (Math.random() - 0.5) * 600,
-    y: (Math.random() - 0.5) * 360,
-    z: Math.random() * 300,
+    x: (Math.random() - 0.5) * 650,
+    y: (Math.random() - 0.5) * 380,
+    z: Math.random() * 320,
     c: ['#ffd9ad', '#ffb68b', '#fff2dd', '#f5c9a8'][Math.floor(Math.random() * 4)],
     s: 0.6 + Math.random() * 2.4
   }));
 
   function project(x, y, z, camZ) {
     const dz = z - camZ;
-    const f = 900 / Math.max(220, dz + 900);
+    const f = 960 / Math.max(260, dz + 960);
     return {
       x: state.w / 2 + x * f,
       y: state.h / 2 + y * f,
@@ -340,10 +342,10 @@
     };
   }
 
-  function drawSoftDot(x, y, r, color, alpha) {
+  function drawGlow(x, y, r, rgba) {
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-    g.addColorStop(0, color.replace('ALPHA', String(alpha)));
-    g.addColorStop(1, color.replace('ALPHA', '0'));
+    g.addColorStop(0, rgba.replace('ALPHA', '1'));
+    g.addColorStop(1, rgba.replace('ALPHA', '0'));
     ctx.fillStyle = g;
     ctx.beginPath();
     ctx.arc(x, y, r, 0, Math.PI * 2);
@@ -355,7 +357,7 @@
     requestAnimationFrame(render);
     t += 0.016;
 
-    state.depth += (state.targetDepth - state.depth) * 0.06;
+    state.depth += (state.targetDepth - state.depth) * 0.075;
     state.energy += ((((state.soundOn ? 0.18 : 0.08) + Math.abs(state.mx) * 0.05 + Math.abs(state.my) * 0.04)) - state.energy) * 0.06;
     state.pulse *= 0.92;
 
@@ -366,56 +368,56 @@
     const insideProgress = Math.max(0, Math.min(1, (depth - 2.2) / 0.8));
 
     const bg = ctx.createLinearGradient(0, 0, 0, state.h);
-    bg.addColorStop(0, '#03040b');
+    bg.addColorStop(0, '#02030a');
     bg.addColorStop(0.55, '#080b16');
     bg.addColorStop(1, insideProgress > 0 ? '#231713' : '#0b0f1b');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, state.w, state.h);
 
-    const camZ = depth * 260;
-    const parX = state.mx * 46;
-    const parY = -state.my * 26;
+    const camZ = depth * 420; // much stronger stage travel
+    const parX = state.mx * 62;
+    const parY = -state.my * 38;
 
     for (const s of starField) {
-      const p = project(s.x + parX * 0.25, s.y + parY * 0.25, s.z, camZ * 0.4);
+      const p = project(s.x + parX * 0.22, s.y + parY * 0.22, s.z, camZ * 0.35);
       if (p.x < -20 || p.x > state.w + 20 || p.y < -20 || p.y > state.h + 20) continue;
-      ctx.globalAlpha = 0.12 + p.s * 0.25;
+      ctx.globalAlpha = 0.10 + p.s * 0.24;
       ctx.fillStyle = s.c;
       ctx.beginPath();
       ctx.arc(p.x, p.y, s.s * p.s, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    // hearts
-    const heartBaseZ = depth * 210;
-    const hb = project(Math.cos(t * 0.72) * 120 + parX * 0.2, Math.sin(t * 0.86) * 38 + 24 + parY * 0.16, heartBaseZ + Math.sin(t) * 20, camZ);
-    const hg = project(Math.cos(t * -0.64) * 112 + parX * 0.18, Math.sin(t * -0.78) * 34 - 22 + parY * 0.14, heartBaseZ - 26 + Math.sin(t * 0.9) * 18, camZ);
-    drawSoftDot(hb.x, hb.y, 34 * hb.s * (1 + state.energy), 'rgba(98,166,255,ALPHA)', 0.36);
-    drawSoftDot(hg.x, hg.y, 30 * hg.s * (1 + state.energy), 'rgba(100,255,175,ALPHA)', 0.34);
+    const heartBaseZ = depth * 350;
+    const hb = project(Math.cos(t * 0.72) * 125 + parX * 0.18, Math.sin(t * 0.86) * 38 + 24 + parY * 0.12, heartBaseZ + Math.sin(t) * 24, camZ);
+    const hg = project(Math.cos(t * -0.64) * 116 + parX * 0.16, Math.sin(t * -0.78) * 34 - 22 + parY * 0.10, heartBaseZ - 34 + Math.sin(t * 0.9) * 20, camZ);
+    drawGlow(hb.x, hb.y, 34 * hb.s * (1 + state.energy), 'rgba(98,166,255,ALPHA)');
+    drawGlow(hg.x, hg.y, 30 * hg.s * (1 + state.energy), 'rgba(100,255,175,ALPHA)');
 
     for (const group of groups) {
-      const local = depth - group.stage;
-      const stageAlpha = Math.max(0, 1 - Math.abs(local) * 0.9);
-      if (stageAlpha < 0.03) continue;
+      const stageDistance = group.stage - depth;
+      const visibility = Math.max(0, 1 - Math.abs(stageDistance) * 0.95);
+      if (visibility < 0.02) continue;
 
-      const gx = group.x + parX * (0.16 + group.stage * 0.02);
-      const gy = group.y + parY * (0.12 + group.stage * 0.02);
-      const gz = group.stage * 260 + group.z;
+      const narrativeZ = group.stage * 420 + group.z + stageDistance * 260; // strong enter/exit
+      const gx = group.x + parX * (0.18 + group.stage * 0.02);
+      const gy = group.y + parY * (0.14 + group.stage * 0.02);
 
-      const auraP = project(gx, gy, gz - 30, camZ);
+      const auraP = project(gx, gy, narrativeZ - 25, camZ);
+      ctx.globalAlpha = 0.45 * visibility;
       ctx.fillStyle = group.aura;
       ctx.beginPath();
-      ctx.ellipse(auraP.x, auraP.y, group.particles.width * 0.62 * auraP.s, group.particles.height * 0.62 * auraP.s, 0, 0, Math.PI * 2);
+      ctx.ellipse(auraP.x, auraP.y, group.particles.width * 0.52 * auraP.s, group.particles.height * 0.52 * auraP.s, 0, 0, Math.PI * 2);
       ctx.fill();
 
       for (const p of group.particles.pts) {
-        const px = gx + p.x + Math.sin(t * 0.8 + p.seed) * (1.2 + state.energy * 2);
-        const py = gy + p.y + Math.cos(t * 0.7 + p.seed * 1.6) * (1.2 + state.energy * 1.8);
-        const pz = gz + p.z + Math.sin(t * 0.9 + p.seed) * (1.8 + state.energy * 3.5);
+        const px = gx + p.x + Math.sin(t * 0.9 + p.seed) * (1.4 + state.energy * 2.4);
+        const py = gy + p.y + Math.cos(t * 0.7 + p.seed * 1.6) * (1.4 + state.energy * 2.0);
+        const pz = narrativeZ + p.z + Math.sin(t * 0.8 + p.seed) * (2.2 + state.energy * 4.2);
         const pr = project(px, py, pz, camZ);
-        if (pr.x < -10 || pr.x > state.w + 10 || pr.y < -10 || pr.y > state.h + 10) continue;
+        if (pr.x < -20 || pr.x > state.w + 20 || pr.y < -20 || pr.y > state.h + 20) continue;
         const r = p.size * pr.s;
-        ctx.globalAlpha = p.a * stageAlpha;
+        ctx.globalAlpha = p.a * visibility;
         ctx.fillStyle = `rgba(${Math.round(p.r*255)},${Math.round(p.g*255)},${Math.round(p.b*255)},1)`;
         ctx.beginPath();
         ctx.arc(pr.x, pr.y, r, 0, Math.PI * 2);
@@ -425,7 +427,7 @@
 
     if (insideProgress > 0.02) {
       for (const d of homeDust) {
-        const p = project(d.x + parX * 0.12, d.y + parY * 0.12, 780 + d.z, camZ);
+        const p = project(d.x + parX * 0.10, d.y + parY * 0.10, 1260 + d.z, camZ);
         if (p.x < -10 || p.x > state.w + 10 || p.y < -10 || p.y > state.h + 10) continue;
         ctx.globalAlpha = insideProgress * 0.22;
         ctx.fillStyle = d.c;
