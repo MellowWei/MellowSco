@@ -7,11 +7,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { margin: 0; background: #000003; overflow: hidden; font-family: 'Hiragino Mincho ProN', 'Georgia', serif; cursor: none; }
-        #webgl-canvas { position: fixed; inset: 0; z-index: 1; filter: contrast(115%) brightness(0.95); }
-        .ui { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 50px; text-align: center; }
-        .title { color: #fff; font-weight: 900; font-style: italic; font-size: 1.6rem; letter-spacing: 0.25em; text-shadow: 0 0 45px rgba(180,100,255,0.8); animation: pulse 4.27s infinite ease-in-out; }
-        @keyframes pulse { 0%, 100% { opacity: 0.9; transform: scale(1); } 50% { opacity: 0.5; transform: scale(0.98); } }
+        body { margin: 0; background: #000002; overflow: hidden; font-family: 'Hiragino Mincho ProN', serif; cursor: none; }
+        #webgl-canvas { position: fixed; inset: 0; z-index: 1; filter: contrast(110%); }
+        .ui { position: fixed; inset: 0; z-index: 100; pointer-events: none; display: flex; flex-direction: column; justify-content: space-between; padding: 60px; text-align: center; }
+        .title { color: #fff; font-weight: 900; font-style: italic; font-size: 1.8rem; letter-spacing: 0.3em; text-shadow: 0 0 50px rgba(180,100,255,0.9); }
         #cursor { width: 4px; height: 4px; background: #fff; border-radius: 50%; position: fixed; pointer-events: none; z-index: 1000; transform: translate(-50%, -50%); mix-blend-mode: difference; }
     </style>
 </head>
@@ -21,67 +20,99 @@
     <div class="ui">
         <div>
             <h1 class="title uppercase">☆ 彡 珏然 // 田野 ♪ ★</h1>
-            <p class="text-[8px] tracking-[1.5em] text-white/25 mt-6 uppercase">77347 // 427Hz SOVEREIGN_GALAXY_EVO</p>
+            <p class="text-[9px] tracking-[1.8em] text-white/20 mt-6 uppercase">77347 // 427Hz MELLOW_SCO_REBORN</p>
         </div>
-        <div style="text-align: center; color: rgba(180,100,255,0.12); font-size: 9px; letter-spacing: 1em; text-transform: uppercase;">Hold to Initiate 44271 Singularity</div>
     </div>
 
+    <script id="vShader" type="x-shader/x-vertex">
+        uniform float uTime;
+        uniform float uMorph;
+        uniform vec2 uMouse;
+        varying vec3 vCol;
+        varying float vA;
+
+        void main() {
+            vec3 p = position;
+            float r = length(p.xy);
+            
+            // 银河螺旋算法
+            float angle = r * 0.008 + uTime * 0.2;
+            vec3 spiral = vec3(
+                cos(angle) * p.x - sin(angle) * p.y,
+                sin(angle) * p.x + cos(angle) * p.y,
+                p.z + sin(r * 0.02 + uTime) * 150.0
+            );
+
+            p = mix(position, spiral, 0.85);
+
+            // 鼠标引力坍缩
+            float dM = distance(p.xy, uMouse * 800.0);
+            float pull = (1.0 / (dM * 0.015 + 1.0)) * uMorph;
+            p.xy = mix(p.xy, uMouse * 800.0, pull * 0.15);
+
+            vCol = mix(color, vec3(0.7, 0.4, 1.0), pull);
+            vA = (0.3 + pull * 0.7) * (1.0 - r / 2500.0);
+
+            vec4 mvp = modelViewMatrix * vec4(p, 1.0);
+            gl_PointSize = clamp(4.0 * (1200.0 / -mvp.z), 1.5, 8.0);
+            gl_Position = projectionMatrix * mvp;
+        }
+    </script>
+
+    <script id="fShader" type="x-shader/x-fragment">
+        varying vec3 vCol;
+        varying float vA;
+        void main() {
+            float d = length(gl_PointCoord - 0.5);
+            if (d > 0.5) discard; // 物理粉碎方块
+            float glow = pow(1.0 - d * 2.0, 2.0);
+            gl_FragColor = vec4(vCol, vA * glow);
+        }
+    </script>
+
     <script>
-        /**
-         * 44271_SOVEREIGN_ENGINE
-         * 1. 强制 427Hz 节律同步。
-         * 2. 物理级无方块 3D 渲染。
-         */
-        let scene, camera, renderer, instMesh, blue, green, mTarget=0, curMorph=0;
+        let scene, camera, renderer, points, mTarget=0, curMorph=0;
         const clock = new THREE.Clock(), mouse = new THREE.Vector2();
-        const COUNT = 144271; // 提升采样密度
+        const COUNT = 124271; 
 
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 1, 5000);
-            camera.position.z = 1350;
+            camera.position.z = 1400;
 
             renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('webgl-canvas'), antialias: true, alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
-            renderer.setPixelRatio(1.0); // 彻底杜绝硬件产生的方块
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-            const palette = [
-                new THREE.Color(0x6644ff), // 魏：冷紫
-                new THREE.Color(0xaa00ff), // 纠缠：品红
-                new THREE.Color(0x00ffff), // 田：青蓝
-                new THREE.Color(0xffcc00)  // 奇点：金色
-            ];
-
-            // 每一个粒子都是真实的微型四面体，杜绝 PointSize 方块
-            const geometry = new THREE.TetrahedronGeometry(1.2, 0); 
-            const material = new THREE.MeshBasicMaterial({ vertexColors: true, transparent: true, opacity: 0.85 });
+            const geo = new THREE.BufferGeometry();
+            const pos = new Float32Array(COUNT * 3), col = new Float32Array(COUNT * 3);
             
-            instMesh = new THREE.InstancedMesh(geometry, material, COUNT);
-            const dummy = new THREE.Object3D();
-            
-            for (let i = 0; i < COUNT; i++) {
-                // 银河对数螺旋 (The Logarithmic Formula)
-                let r = Math.pow(Math.random(), 0.55) * 1800;
-                let theta = Math.random() * Math.PI * 2 + r * 0.0038; 
-                let z = (Math.random() - 0.5) * (200 - r * 0.1); 
+            for(let i=0; i<COUNT; i++) {
+                let r = Math.pow(Math.random(), 0.6) * 2000;
+                let theta = Math.random() * Math.PI * 2;
+                pos[i*3] = Math.cos(theta) * r; pos[i*3+1] = Math.sin(theta) * r; pos[i*3+2] = (Math.random()-0.5)*300;
                 
-                dummy.position.set(Math.cos(theta) * r, Math.sin(theta) * r, z);
-                dummy.updateMatrix();
-                instMesh.setMatrixAt(i, dummy.matrix);
-                
-                let colIdx = Math.floor(Math.random() * 3);
-                if (r < 220) colIdx = 3; // 核心区域采样金色
-                instMesh.setColorAt(i, palette[colIdx]);
+                // 采样紫色主权色盘
+                col[i*3] = 0.5 + Math.random()*0.5; // R
+                col[i*3+1] = 0.3; // G
+                col[i*3+2] = 1.0; // B
             }
-            scene.add(instMesh);
+            geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+            geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
 
-            blue = new THREE.Mesh(new THREE.SphereGeometry(6, 16, 16), new THREE.MeshBasicMaterial({color: 0x6644ff}));
-            green = new THREE.Mesh(new THREE.SphereGeometry(6, 16, 16), new THREE.MeshBasicMaterial({color: 0x00ffcc}));
-            scene.add(blue); scene.add(green);
+            const mat = new THREE.ShaderMaterial({
+                uniforms: { uTime:{value:0}, uMorph:{value:0}, uMouse:{value:new THREE.Vector2()} },
+                vertexShader: document.getElementById('vShader').textContent,
+                fragmentShader: document.getElementById('fShader').textContent,
+                transparent: true, blending: THREE.AdditiveBlending, depthWrite: false
+            });
+
+            points = new THREE.Points(geo, mat);
+            scene.add(points);
 
             window.addEventListener('mousemove', (e) => {
-                mouse.x = (e.clientX - window.innerWidth/2);
-                mouse.y = -(e.clientY - window.innerHeight/2);
+                mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+                mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
                 document.getElementById('cursor').style.left = e.clientX + 'px';
                 document.getElementById('cursor').style.top = e.clientY + 'px';
             });
@@ -93,39 +124,23 @@
         function animate() {
             requestAnimationFrame(animate);
             const t = clock.getElapsedTime();
-            curMorph += (mTarget - curMorph) * 0.045; // 提升引力响应感质
+            curMorph += (mTarget - curMorph) * 0.05;
             
-            const rOrbit = 360 + Math.sin(t*0.4)*80;
-            blue.position.set(Math.sin(t*0.7)*rOrbit + mouse.x/4, Math.cos(t*0.9)*rOrbit*0.3 + mouse.y/4, Math.sin(t*0.5)*100);
-            green.position.set(Math.sin(t*0.7+3.14)*rOrbit + mouse.x/4, Math.cos(t*0.9+3.14)*rOrbit*0.3 + mouse.y/4, -Math.sin(t*0.5)*100);
+            points.material.uniforms.uTime.value = t;
+            points.material.uniforms.uMorph.value = curMorph;
+            points.material.uniforms.uMouse.value.lerp(mouse, 0.1);
 
-            const dummy = new THREE.Object3D();
-            const matrix = new THREE.Matrix4();
-            
-            for (let i = 0; i < COUNT; i++) {
-                instMesh.getMatrixAt(i, matrix);
-                dummy.position.setFromMatrixPosition(matrix);
-                
-                // 银河自转 (427Hz 调频)
-                dummy.position.applyAxisAngle(new THREE.Vector3(0,0,1), 0.003 + curMorph*0.018);
-                
-                // 44271 引力坍缩
-                let dB = dummy.position.distanceTo(blue.position);
-                let dG = dummy.position.distanceTo(green.position);
-                let pull = (1.0 / (dB * 0.022 + 1.0) + 1.0 / (dG * 0.022 + 1.0)) * curMorph;
-                dummy.position.lerp(blue.position, pull * 0.055);
-                
-                dummy.updateMatrix();
-                instMesh.setMatrixAt(i, dummy.matrix);
-            }
-            instMesh.instanceMatrix.needsUpdate = true;
-
-            camera.position.x += (mouse.x/14 - camera.position.x) * 0.05;
-            camera.position.y += (mouse.y/14 - camera.position.y) * 0.05;
+            camera.position.x += (mouse.x * 100 - camera.position.x) * 0.05;
+            camera.position.y += (mouse.y * 100 - camera.position.y) * 0.05;
             camera.lookAt(0,0,0);
             renderer.render(scene, camera);
         }
         init();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     </script>
 </body>
 </html>
