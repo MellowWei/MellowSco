@@ -2,567 +2,488 @@
 <html lang="zh">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>THE_GETAWAY</title>
 <style>
-  :root{
-    --bg:#04040b;
-    --blue:#6bb8ff;
-    --green:#73ffa8;
-    --violet:#7e64ff;
-    --gold:#ffcb75;
-    --text:rgba(232,239,255,.92);
-    --muted:rgba(220,226,255,.42);
-    --panel:rgba(8,10,22,.18);
-  }
-  *{box-sizing:border-box;margin:0;padding:0}
-  html,body{width:100%;height:100%;overflow:hidden;background:radial-gradient(circle at 50% 45%,#121630 0%,#060710 42%,#020206 100%);font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-  canvas{position:fixed;inset:0;display:block}
-  #overlay{position:fixed;inset:0;pointer-events:none;z-index:10}
-  #title{position:absolute;top:24px;left:50%;transform:translateX(-50%);color:var(--text);font:300 12px/1.3 "Georgia","Times New Roman",serif;letter-spacing:.72em;text-shadow:0 0 40px rgba(122,138,255,.3)}
-  #hud{position:absolute;top:24px;right:24px;text-align:right;color:var(--muted);font:11px/1.9 "Courier New",monospace;letter-spacing:.16em;text-transform:uppercase}
-  #hud .strong{color:rgba(255,255,255,.82)}
-  #hud .blue{color:rgba(124,190,255,.88)}
-  #hud .violet{color:rgba(214,170,255,.72)}
-  #leftPanel{position:absolute;top:24px;left:24px;display:flex;flex-direction:column;gap:12px;pointer-events:auto}
-  .ctrl{width:34px;height:34px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(10,12,24,.34);display:grid;place-items:center;backdrop-filter:blur(10px);cursor:pointer;transition:transform .25s ease,border-color .25s ease,background .25s ease}
-  .ctrl:hover{transform:scale(1.06);border-color:rgba(130,190,255,.45);background:rgba(14,18,34,.55)}
-  .ctrl svg{width:15px;height:15px;fill:rgba(235,242,255,.82)}
-  #sceneLabel{position:absolute;left:50%;bottom:132px;transform:translateX(-50%);padding:12px 18px;border-radius:999px;border:1px solid rgba(255,255,255,.09);background:rgba(8,10,20,.28);backdrop-filter:blur(14px);box-shadow:0 12px 38px rgba(0,0,0,.18);color:rgba(239,242,255,.92);font:400 12px/1.2 "Courier New",monospace;letter-spacing:.28em;text-transform:uppercase;text-align:center;min-width:290px}
-  #sceneLabel .sub{display:block;margin-top:6px;color:var(--muted);font-size:9px;letter-spacing:.23em}
-  #timeline{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);width:min(520px,calc(100vw - 72px));height:1px;background:rgba(255,255,255,.11)}
-  #timeline .dot{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;transform:translate(-50%,-50%);background:rgba(255,255,255,.3);box-shadow:0 0 0 8px rgba(255,255,255,.02);transition:all .28s ease}
-  #timeline .dot.active{background:#fff;box-shadow:0 0 20px rgba(170,195,255,.95),0 0 0 9px rgba(148,175,255,.10)}
-  #timeline .dot span{position:absolute;top:16px;left:50%;transform:translateX(-50%);white-space:nowrap;color:rgba(229,233,255,.38);font:10px/1 "Courier New",monospace;letter-spacing:.18em;text-transform:uppercase}
-  #timeline .dot.active span{color:rgba(239,243,255,.88)}
-  #hint{position:absolute;bottom:24px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.22);font:10px/1.2 "Courier New",monospace;letter-spacing:.22em;text-align:center}
-  #hearts{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:min(70vw,780px);height:min(56vh,560px);pointer-events:none;opacity:.8;mix-blend-mode:screen;filter:blur(.1px)}
-  .heartMark{position:absolute;font-size:18px;will-change:transform,opacity;text-shadow:0 0 28px currentColor,0 0 60px currentColor}
-  .heartA{color:rgba(108,184,255,.92)}
-  .heartB{color:rgba(115,255,168,.88)}
-  #vignette{position:absolute;inset:0;background:radial-gradient(circle at 50% 48%, rgba(255,255,255,0) 34%, rgba(0,0,0,.16) 60%, rgba(0,0,0,.52) 100%)}
-  #enterField{position:absolute;inset:14% 18%;border-radius:50%;border:1px solid rgba(155,182,255,.08);box-shadow:inset 0 0 80px rgba(152,129,255,.04);opacity:.7}
-  #flash{position:absolute;inset:0;background:radial-gradient(circle at center, rgba(255,255,255,.16) 0%, rgba(149,174,255,.08) 18%, rgba(0,0,0,0) 45%);opacity:0;transition:opacity .35s ease}
-  @media (max-width:740px){
-    #title{top:18px;font-size:10px;letter-spacing:.48em}
-    #hud{top:18px;right:18px;font-size:9px}
-    #leftPanel{top:18px;left:18px}
-    #sceneLabel{bottom:118px;min-width:auto;width:calc(100vw - 42px);padding:11px 12px;font-size:10px;letter-spacing:.18em}
-    #sceneLabel .sub{font-size:8px;letter-spacing:.14em}
-    #timeline{bottom:70px;width:calc(100vw - 48px)}
-    #hint{bottom:18px;font-size:8px;line-height:1.5;padding:0 18px}
-  }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:#03040b;color:#fff;cursor:none}
+body{
+  background:
+    radial-gradient(circle at 50% 18%, rgba(255,225,170,.10), transparent 16%),
+    radial-gradient(circle at 20% 18%, rgba(88,140,255,.12), transparent 28%),
+    radial-gradient(circle at 82% 22%, rgba(166,104,255,.10), transparent 24%),
+    linear-gradient(180deg,#02030a 0%,#070915 45%,#0a0d18 100%);
+  font-family:"Hiragino Mincho ProN","Times New Roman",serif;
+}
+canvas{position:fixed;inset:0;display:block}
+#ui{position:fixed;inset:0;pointer-events:none;z-index:5}
+#title{
+  position:absolute;top:24px;left:50%;transform:translateX(-50%);
+  font-size:clamp(11px,1.15vw,14px);letter-spacing:.48em;color:rgba(240,245,255,.8);
+  text-shadow:0 0 22px rgba(103,149,255,.36),0 0 32px rgba(182,108,255,.22);
+  white-space:nowrap
+}
+#sound{
+  pointer-events:auto;position:absolute;top:22px;left:28px;width:30px;height:30px;border-radius:999px;
+  border:1px solid rgba(208,220,255,.16);display:grid;place-items:center;
+  background:rgba(255,255,255,.03);backdrop-filter:blur(10px);color:rgba(255,255,255,.72);
+  font-size:12px
+}
+#sound.on{border-color:rgba(164,190,255,.42);box-shadow:0 0 18px rgba(116,176,255,.18)}
+#hud{
+  position:absolute;top:24px;right:28px;text-align:right;
+  font-family:"Courier New",monospace;font-size:10px;letter-spacing:.16em;line-height:1.85;
+  color:rgba(216,225,255,.78)
+}
+#hud .muted{color:rgba(178,190,255,.5)}
+#timeline{
+  position:absolute;left:28px;top:72px;font-family:"Courier New",monospace;
+  font-size:10px;letter-spacing:.18em;color:rgba(225,232,255,.72)
+}
+.stage{display:flex;align-items:center;gap:10px;opacity:.25;transform:translateX(0);transition:.35s}
+.stage.active{opacity:1;transform:translateX(8px);text-shadow:0 0 16px rgba(170,136,255,.25)}
+.dot{width:8px;height:8px;border-radius:999px;background:rgba(220,230,255,.2)}
+.stage.active .dot{background:linear-gradient(135deg,#6fb0ff,#d294ff);box-shadow:0 0 12px rgba(125,178,255,.4)}
+#label{
+  position:absolute;bottom:92px;left:50%;transform:translateX(-50%);
+  font-size:clamp(16px,1.8vw,24px);letter-spacing:.34em;color:rgba(250,252,255,.94);
+  text-shadow:0 0 22px rgba(112,154,255,.3),0 0 32px rgba(170,100,255,.24);white-space:nowrap
+}
+#sub{
+  position:absolute;bottom:64px;left:50%;transform:translateX(-50%);
+  font-family:"Courier New",monospace;font-size:9px;letter-spacing:.22em;color:rgba(220,228,255,.56);white-space:nowrap
+}
+#hint{
+  position:absolute;bottom:26px;left:50%;transform:translateX(-50%);
+  font-family:"Courier New",monospace;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,.26);white-space:nowrap
+}
+#cursor1,#cursor2{position:fixed;pointer-events:none;z-index:10;transform:translate(-50%,-50%);border-radius:999px}
+#cursor1{width:6px;height:6px;background:#fff;mix-blend-mode:screen}
+#cursor2{width:22px;height:22px;border:1px solid rgba(220,228,255,.18);mix-blend-mode:screen}
+@media (max-width:800px){
+  #timeline{top:68px;font-size:9px}
+  #hint{width:90vw;white-space:normal;line-height:1.6;text-align:center}
+  #label{bottom:100px}
+  #sub{bottom:72px}
+}
 </style>
 </head>
 <body>
-<canvas id="stage"></canvas>
-<div id="overlay">
+<canvas id="c"></canvas>
+<div id="ui">
   <div id="title">T H E _ G E T A W A Y</div>
-  <div id="leftPanel">
-    <button id="soundBtn" class="ctrl" aria-label="toggle sound">
-      <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-    </button>
-    <button id="pulseBtn" class="ctrl" aria-label="pulse">
-      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-    </button>
+  <button id="sound">♪</button>
+  <div id="timeline">
+    <div class="stage active"><span class="dot"></span><span>GALAXY</span></div>
+    <div class="stage"><span class="dot"></span><span>SPACE POD</span></div>
+    <div class="stage"><span class="dot"></span><span>OUTSIDE HOME</span></div>
+    <div class="stage"><span class="dot"></span><span>INSIDE HOME</span></div>
   </div>
   <div id="hud">
-    <div class="strong">ARCHIVE : 77347 / 44271</div>
-    <div class="blue">STATUS : THE GETAWAY</div>
-    <div class="violet">FIELD : BLUE HEART × GREEN HEART</div>
-    <div>ENTRY : MOUSE DESCENT</div>
+    <div>ARCHIVE : 77347 / 44271</div>
+    <div>FIELD : BLUE HEART × GREEN HEART</div>
+    <div class="muted" id="energy">ENERGY : 0.00</div>
+    <div class="muted">MOUSE ↓ : ENTER DEEPER</div>
   </div>
-  <div id="sceneLabel">GALAXY<div class="sub">move mouse downward to enter</div></div>
-  <div id="timeline">
-    <div class="dot active" data-i="0" style="left:0%"><span>galaxy</span></div>
-    <div class="dot" data-i="1" style="left:33.333%"><span>pod</span></div>
-    <div class="dot" data-i="2" style="left:66.666%"><span>garden</span></div>
-    <div class="dot" data-i="3" style="left:100%"><span>inside</span></div>
-  </div>
-  <div id="hint">move cursor down to travel deeper · wheel for drift · click pulse to flare hearts</div>
-  <div id="hearts"></div>
-  <div id="enterField"></div>
-  <div id="vignette"></div>
-  <div id="flash"></div>
+  <div id="label">GALAXY</div>
+  <div id="sub">blue-black seed × violet-gold drift</div>
+  <div id="hint">鼠标上下移动 = 从银河进入太空舱，再进入花园与家园内部 ｜ 这版强化了图片形态可见度</div>
 </div>
-<audio id="bgm" src="N%2038th%20St%20%26%20Lancaster%20Ave%20Stop.m4a" loop preload="auto" crossorigin="anonymous"></audio>
+<div id="cursor1"></div><div id="cursor2"></div>
+<audio id="bgm" src="winter_sun.m4a" preload="auto" loop></audio>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-(() => {
-  const canvas = document.getElementById('stage');
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.8));
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor(0x020207, 1);
+(()=>{
+  const canvas = document.getElementById('c');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setSize(innerWidth,innerHeight);
+  renderer.setClearColor(0x040611,1);
 
   const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x03040a, 0.018);
+  scene.fog = new THREE.FogExp2(0x050815, 0.012);
+  const camera = new THREE.PerspectiveCamera(54, innerWidth/innerHeight, .1, 240);
+  camera.position.set(0,0,10);
 
-  const camera = new THREE.PerspectiveCamera(56, window.innerWidth / window.innerHeight, 0.1, 300);
-  camera.position.set(0, 0, 9);
+  const root = new THREE.Group(); scene.add(root);
+  scene.add(new THREE.AmbientLight(0xffffff, .86));
+  const lightA = new THREE.PointLight(0x6faeff, 1.55, 55); lightA.position.set(-3,1.8,8); scene.add(lightA);
+  const lightB = new THREE.PointLight(0xbc85ff, 1.35, 55); lightB.position.set(3,-1.2,6); scene.add(lightB);
+  const warmA = new THREE.PointLight(0xffcc95, 0, 34); warmA.position.set(-2.2,.8,-52); scene.add(warmA);
+  const warmB = new THREE.PointLight(0xff9f74, 0, 28); warmB.position.set(2.4,-.3,-54); scene.add(warmB);
 
-  const loader = new THREE.TextureLoader();
-  loader.setCrossOrigin('anonymous');
-
-  const mouse = { x: 0, y: 0, targetProgress: 0, extra: 0 };
-  const state = { progress: 0, pulse: 0, audioLevel: 0, time: 0 };
-
-  const SCENES = [
-    { title: 'GALAXY', sub: 'violet gold core · blue-black drift', z: 0 },
-    { title: 'SPACE POD', sub: 'entering the vessel window', z: -26 },
-    { title: 'HOMELAND EXTERIOR', sub: 'garden threshold · flowering path', z: -52 },
-    { title: 'HOMELAND INTERIOR', sub: 'inside light · sea and sunset', z: -78 }
+  const stageZ = [0,-18,-36,-54];
+  const stageMeta = [
+    ['GALAXY','blue-black seed × violet-gold drift'],
+    ['SPACE POD','glass orbit · vessel of arrival'],
+    ['OUTSIDE HOME','garden threshold · flowering gravity'],
+    ['INSIDE HOME','warm sunset room · sea-facing return']
   ];
 
-  const sceneLabel = document.getElementById('sceneLabel');
-  const dots = [...document.querySelectorAll('#timeline .dot')];
-  const flash = document.getElementById('flash');
+  const label = document.getElementById('label');
+  const sub = document.getElementById('sub');
+  const energyEl = document.getElementById('energy');
+  const stagesUI = [...document.querySelectorAll('.stage')];
+  const cursor1 = document.getElementById('cursor1');
+  const cursor2 = document.getElementById('cursor2');
 
-  const heartsEl = document.getElementById('hearts');
-  const heartNodes = [];
-  for(let i=0;i<36;i++){
-    const n = document.createElement('div');
-    n.className = 'heartMark ' + (i % 2 === 0 ? 'heartA' : 'heartB');
-    n.textContent = i % 2 === 0 ? '♥' : '♥';
-    heartsEl.appendChild(n);
-    heartNodes.push({ el:n, angle: Math.random() * Math.PI * 2, radius: 18 + Math.random() * 42, phase: Math.random() * Math.PI * 2, speed: 0.35 + Math.random() * 0.8, depth: 0.5 + Math.random() });
+  const state = {mx:0,my:0,targetDepth:0,depth:0,energy:0,pulse:0};
+
+  function cursorMove(x,y){
+    cursor1.style.left = cursor2.style.left = x+'px';
+    cursor1.style.top = cursor2.style.top = y+'px';
   }
+  cursorMove(innerWidth/2, innerHeight/2);
 
-  function updateOverlay(progress){
-    const i = Math.min(3, Math.max(0, Math.round(progress * 3)));
-    sceneLabel.innerHTML = `${SCENES[i].title}<div class="sub">${SCENES[i].sub}</div>`;
-    dots.forEach((d, idx) => d.classList.toggle('active', idx === i));
+  addEventListener('mousemove', e=>{
+    const x = e.clientX/innerWidth, y = e.clientY/innerHeight;
+    state.mx = (x-.5)*2;
+    state.my = -(y-.5)*2;
+    state.targetDepth = y*3;
+    cursorMove(e.clientX,e.clientY);
+  });
+  addEventListener('touchmove', e=>{
+    const t=e.touches[0], x=t.clientX/innerWidth, y=t.clientY/innerHeight;
+    state.mx = (x-.5)*2;
+    state.my = -(y-.5)*2;
+    state.targetDepth = y*3;
+    cursorMove(t.clientX,t.clientY);
+  },{passive:true});
+  addEventListener('dblclick', ()=> state.pulse = 1);
+
+  function makeHeart(colorCore, colorGlow){
+    const cv = document.createElement('canvas'); cv.width=cv.height=256;
+    const ctx = cv.getContext('2d');
+    let g = ctx.createRadialGradient(128,128,8,128,128,128);
+    g.addColorStop(0,colorCore); g.addColorStop(.25,colorGlow); g.addColorStop(1,'rgba(0,0,0,0)');
+    ctx.fillStyle=g; ctx.beginPath(); ctx.arc(128,128,120,0,Math.PI*2); ctx.fill();
+    ctx.save(); ctx.translate(128,130); ctx.scale(4.9,4.9);
+    ctx.beginPath();
+    ctx.moveTo(0,7);
+    ctx.bezierCurveTo(0,7,-10,0,-10,-6);
+    ctx.bezierCurveTo(-10,-12,-3,-15,0,-10);
+    ctx.bezierCurveTo(3,-15,10,-12,10,-6);
+    ctx.bezierCurveTo(10,0,0,7,0,7);
+    ctx.closePath();
+    ctx.fillStyle='rgba(255,255,255,1)';
+    ctx.shadowBlur=16; ctx.shadowColor='#fff'; ctx.fill();
+    ctx.restore();
+    const tex = new THREE.CanvasTexture(cv);
+    const mat = new THREE.SpriteMaterial({map:tex,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false});
+    const sp = new THREE.Sprite(mat);
+    sp.scale.set(1.4,1.4,1);
+    return sp;
   }
+  const heartBlue = makeHeart('rgba(93,164,255,.95)','rgba(31,70,180,.25)');
+  const heartGreen = makeHeart('rgba(97,255,173,.95)','rgba(20,98,55,.22)');
+  root.add(heartBlue,heartGreen);
 
-  function triggerPulse(){
-    state.pulse = 1;
-    flash.style.opacity = '1';
-    setTimeout(() => flash.style.opacity = '0', 120);
-  }
-
-  document.getElementById('pulseBtn').addEventListener('click', triggerPulse);
-  window.addEventListener('dblclick', triggerPulse);
-
-  // Audio
-  const audio = document.getElementById('bgm');
-  const soundBtn = document.getElementById('soundBtn');
-  let audioCtx = null, analyser = null, source = null, dataArray = null, soundOn = false;
-  async function toggleSound(){
-    try{
-      if(!audioCtx){
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        analyser = audioCtx.createAnalyser();
-        analyser.fftSize = 256;
-        dataArray = new Uint8Array(analyser.frequencyBinCount);
-        source = audioCtx.createMediaElementSource(audio);
-        source.connect(analyser);
-        analyser.connect(audioCtx.destination);
-      }
-      if(audioCtx.state === 'suspended') await audioCtx.resume();
-      if(soundOn){ audio.pause(); soundOn = false; soundBtn.style.borderColor = 'rgba(255,255,255,.14)'; }
-      else { await audio.play(); soundOn = true; soundBtn.style.borderColor = 'rgba(122,190,255,.6)'; }
-    }catch(e){ console.warn(e); }
-  }
-  soundBtn.addEventListener('click', toggleSound);
-
-  // Core groups
-  const world = new THREE.Group();
-  scene.add(world);
-
-  function makeSprite(tex, x, y, z, s=1, opacity=1){
-    const mat = new THREE.SpriteMaterial({ map: tex, transparent: true, depthWrite: false, opacity, blending: THREE.AdditiveBlending });
-    const sprite = new THREE.Sprite(mat);
-    sprite.position.set(x,y,z);
-    sprite.scale.set(s * tex.image.width / 280, s * tex.image.height / 280, 1);
-    return sprite;
-  }
-
-  function createStarField(count, spread, colorSet){
-    const geo = new THREE.BufferGeometry();
-    const pos = new Float32Array(count * 3);
-    const col = new Float32Array(count * 3);
+  function makeDust(count, spread, palette){
+    const pos = new Float32Array(count*3);
+    const col = new Float32Array(count*3);
     const size = new Float32Array(count);
     for(let i=0;i<count;i++){
-      const r = Math.pow(Math.random(), .55) * spread;
-      const a = Math.random() * Math.PI * 2;
-      const h = (Math.random() - .5) * spread * .55;
-      pos[i*3] = Math.cos(a) * r;
-      pos[i*3+1] = h;
-      pos[i*3+2] = (Math.random() - .5) * spread * 1.7;
-      const c = colorSet[(Math.random() * colorSet.length) | 0];
-      col[i*3] = c[0]; col[i*3+1] = c[1]; col[i*3+2] = c[2];
-      size[i] = .7 + Math.random() * 2.4;
+      pos[i*3] = (Math.random()-.5)*spread.x;
+      pos[i*3+1] = (Math.random()-.5)*spread.y;
+      pos[i*3+2] = (Math.random()-.5)*spread.z;
+      const c = new THREE.Color(palette[(Math.random()*palette.length)|0]);
+      col[i*3]=c.r; col[i*3+1]=c.g; col[i*3+2]=c.b;
+      size[i]=1+Math.random()*4.8;
     }
-    geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
-    geo.setAttribute('color', new THREE.BufferAttribute(col,3));
-    geo.setAttribute('size', new THREE.BufferAttribute(size,1));
-    const mat = new THREE.ShaderMaterial({
-      transparent:true,
-      depthWrite:false,
-      blending:THREE.AdditiveBlending,
-      uniforms:{ uTime:{ value:0 }, uPulse:{ value:0 } },
+    const g = new THREE.BufferGeometry();
+    g.setAttribute('position', new THREE.BufferAttribute(pos,3));
+    g.setAttribute('color', new THREE.BufferAttribute(col,3));
+    g.setAttribute('size', new THREE.BufferAttribute(size,1));
+    const m = new THREE.ShaderMaterial({
+      transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, vertexColors:true,
+      uniforms:{uTime:{value:0},uEnergy:{value:0}},
       vertexShader:`
-        attribute float size;
-        varying vec3 vColor;
-        uniform float uTime;
-        uniform float uPulse;
+        attribute float size; varying vec3 vColor;
+        uniform float uTime; uniform float uEnergy;
         void main(){
-          vColor = color;
           vec3 p = position;
-          p.x += sin(uTime*0.14 + position.z*0.2 + position.y*0.1) * 0.16;
-          p.y += cos(uTime*0.18 + position.x*0.12) * 0.12;
+          p.x += sin(uTime*.2 + position.z*.04)*.18;
+          p.y += cos(uTime*.24 + position.x*.06)*.14;
           vec4 mv = modelViewMatrix * vec4(p,1.0);
-          gl_PointSize = size * (260.0 / -mv.z) * (1.0 + uPulse*0.6);
+          gl_PointSize = size * (130.0 / max(1.0,-mv.z)) * (1.0 + uEnergy*.32);
           gl_Position = projectionMatrix * mv;
-        }
-      `,
+          vColor = color;
+        }`,
       fragmentShader:`
         varying vec3 vColor;
         void main(){
-          vec2 uv = gl_PointCoord - 0.5;
-          float d = length(uv);
-          float a = smoothstep(0.5, 0.0, d);
-          gl_FragColor = vec4(vColor, a);
-        }
-      `,
-      vertexColors:true
+          vec2 uv=gl_PointCoord-.5; float d=length(uv);
+          float a=smoothstep(.5,.0,d);
+          if(a<.02) discard;
+          gl_FragColor=vec4(vColor,a*.78);
+        }`
     });
-    const points = new THREE.Points(geo, mat);
-    points.userData.isStarField = true;
-    return points;
+    return new THREE.Points(g,m);
   }
 
-  const starPalette = [
-    [0.46,0.72,1.0],[0.25,0.42,0.95],[0.55,0.34,1.0],[1.0,0.8,0.5],[0.72,0.95,1.0]
-  ];
-  const starsNear = createStarField(9000, 42, starPalette);
-  const starsFar = createStarField(5000, 78, [[0.32,0.40,0.84],[0.70,0.45,1.0],[1.0,0.78,0.52]]);
-  starsFar.position.z = -12;
-  world.add(starsFar, starsNear);
+  const galaxyDust = makeDust(2200,{x:30,y:18,z:72},['#517dff','#8d62ff','#f2bb72','#b97dff','#7fe8ff']);
+  root.add(galaxyDust);
+  const homeDust = makeDust(1000,{x:14,y:10,z:10},['#ffd8b0','#ffb486','#fff0d9','#f8c4a0']);
+  homeDust.position.set(0,0,-54.5);
+  root.add(homeDust);
 
-  // Infinity hearts orbit
-  const heartGroup = new THREE.Group();
-  world.add(heartGroup);
+  function makePointTexture(){
+    const c = document.createElement('canvas'); c.width = c.height = 64;
+    const ctx = c.getContext('2d');
+    const g = ctx.createRadialGradient(32,32,0,32,32,32);
+    g.addColorStop(0,'rgba(255,255,255,1)');
+    g.addColorStop(.2,'rgba(255,255,255,.95)');
+    g.addColorStop(.6,'rgba(255,255,255,.35)');
+    g.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle = g;
+    ctx.fillRect(0,0,64,64);
+    return new THREE.CanvasTexture(c);
+  }
+  const pointTex = makePointTexture();
 
-  function heartCurve(scale, sign, color){
+  function buildParticleImage(tex, opt={}){
+    const img = tex.image;
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    const ctx = c.getContext('2d', {willReadFrequently:true});
+    ctx.drawImage(img,0,0);
+    const data = ctx.getImageData(0,0,img.width,img.height).data;
+
+    const sample = opt.sample || 4;        // denser
+    const scale = opt.scale || 6;
+    const depth = opt.depth || 1.5;
+
     const pts = [];
-    for(let i=0;i<450;i++){
-      const t = (i / 449) * Math.PI * 2;
-      const x = sign * scale * Math.sin(t);
-      const y = scale * Math.sin(t) * Math.cos(t);
-      const z = Math.cos(t*2.0) * scale * 0.25;
-      pts.push(new THREE.Vector3(x, y, z));
+    for(let y=0;y<img.height;y+=sample){
+      for(let x=0;x<img.width;x+=sample){
+        const i=(y*img.width+x)*4;
+        const a=data[i+3]/255;
+        if(a < .15) continue;
+        const r=data[i]/255, g=data[i+1]/255, b=data[i+2]/255;
+        const lum = (r+g+b)/3;
+        if(lum < .03) continue;
+        // Keep more points so silhouette is visible.
+        if(Math.random() > (.96 + lum*.03)) continue;
+        pts.push({
+          x:(x/img.width-.5)*scale,
+          y:-(y/img.height-.5)*scale*(img.height/img.width),
+          z:(Math.random()-.5)*depth*(.45+lum*.5),
+          r,g,b,
+          s:2.2 + lum*4.6 + Math.random()*1.2,
+          seed:Math.random()*6.283
+        });
+      }
     }
-    const arr = new Float32Array(pts.length * 3);
-    const cols = new Float32Array(pts.length * 3);
-    pts.forEach((p, i) => {
-      arr[i*3]=p.x; arr[i*3+1]=p.y; arr[i*3+2]=p.z;
-      cols[i*3]=color.r; cols[i*3+1]=color.g; cols[i*3+2]=color.b;
-    });
-    const geo = new THREE.BufferGeometry();
-    geo.setAttribute('position', new THREE.BufferAttribute(arr,3));
-    geo.setAttribute('color', new THREE.BufferAttribute(cols,3));
-    const mat = new THREE.PointsMaterial({ size:0.11, transparent:true, opacity:.9, depthWrite:false, blending:THREE.AdditiveBlending, vertexColors:true });
-    const p = new THREE.Points(geo, mat);
-    return p;
-  }
-  const blueHeart3D = heartCurve(1.55, -1, new THREE.Color('#6bb8ff'));
-  const greenHeart3D = heartCurve(1.55, 1, new THREE.Color('#73ffa8'));
-  heartGroup.add(blueHeart3D, greenHeart3D);
-  heartGroup.position.set(0,0,-6);
 
-  // Float dust 
-  function particleDust(count, area, colors){
+    const pos = new Float32Array(pts.length*3);
+    const col = new Float32Array(pts.length*3);
+    const siz = new Float32Array(pts.length);
+    const seed = new Float32Array(pts.length);
+    pts.forEach((p,i)=>{
+      pos[i*3]=p.x; pos[i*3+1]=p.y; pos[i*3+2]=p.z;
+      col[i*3]=p.r; col[i*3+1]=p.g; col[i*3+2]=p.b;
+      siz[i]=p.s; seed[i]=p.seed;
+    });
+
     const geo = new THREE.BufferGeometry();
-    const pos = new Float32Array(count*3), col = new Float32Array(count*3);
-    for(let i=0;i<count;i++){
-      pos[i*3]=(Math.random()-.5)*area.x;
-      pos[i*3+1]=(Math.random()-.5)*area.y;
-      pos[i*3+2]=(Math.random()-.5)*area.z;
-      const c = colors[(Math.random()*colors.length)|0];
-      col[i*3]=c[0]; col[i*3+1]=c[1]; col[i*3+2]=c[2];
-    }
     geo.setAttribute('position', new THREE.BufferAttribute(pos,3));
     geo.setAttribute('color', new THREE.BufferAttribute(col,3));
-    const mat = new THREE.PointsMaterial({ size:0.09, transparent:true, opacity:.45, depthWrite:false, blending:THREE.AdditiveBlending, vertexColors:true });
-    return new THREE.Points(geo, mat);
-  }
-  world.add(particleDust(3000, {x:26,y:18,z:95}, [[0.4,0.8,1],[0.75,0.44,1],[1,0.8,0.5],[0.5,1,0.7]]));
+    geo.setAttribute('size', new THREE.BufferAttribute(siz,1));
+    geo.setAttribute('seed', new THREE.BufferAttribute(seed,1));
 
-  // Scene builders: convert images to layered point clouds
-  const imageGroups = [];
-  const imgConfigs = [
-    { files:['space.jpg'], z:0, spread:12, size:0.22, x:0, y:0.2, layers:5, scale:0.018 },
-    { files:['spaceship.jpg','spaceship1.jpg','spaceship2.webp'], z:-26, spread:14, size:0.18, x:0, y:0, layers:4, scale:0.014 },
-    { files:['home1.jpg','home2.jpg'], z:-52, spread:13, size:0.18, x:0, y:-0.2, layers:4, scale:0.014 },
-    { files:['home3.jpg','home4.jpg'], z:-78, spread:13, size:0.18, x:0, y:-0.1, layers:4, scale:0.014 }
-  ];
-
-  function buildParticleImage(url, opts){
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => {
-        const down = url.includes('space') ? 4 : 5;
-        const maxW = 170;
-        const ratio = img.height / img.width;
-        const w = maxW;
-        const h = Math.round(maxW * ratio);
-        const cv = document.createElement('canvas');
-        cv.width = w; cv.height = h;
-        const cx = cv.getContext('2d', { willReadFrequently:true });
-        cx.drawImage(img, 0, 0, w, h);
-        const data = cx.getImageData(0,0,w,h).data;
-
-        const g = new THREE.Group();
-        const positions = [];
-        const colors = [];
-        const sizes = [];
-        for(let y=0;y<h;y+=down){
-          for(let x=0;x<w;x+=down){
-            const idx = (y*w + x) * 4;
-            const a = data[idx+3] / 255;
-            if(a < 0.6) continue;
-            const r = data[idx] / 255, gg = data[idx+1] / 255, b = data[idx+2] / 255;
-            const lum = (r + gg + b) / 3;
-            if(lum < (url.includes('home') ? 0.12 : 0.08)) continue;
-            const px = (x - w/2) * opts.scale;
-            const py = -(y - h/2) * opts.scale;
-            const pz = (Math.random() - 0.5) * opts.spread * 0.4;
-            positions.push(px, py, pz);
-            colors.push(r, gg, b);
-            sizes.push(opts.size * (0.6 + lum*1.4));
-          }
-        }
-        const geo = new THREE.BufferGeometry();
-        geo.setAttribute('position', new THREE.Float32BufferAttribute(positions,3));
-        geo.setAttribute('color', new THREE.Float32BufferAttribute(colors,3));
-        geo.setAttribute('size', new THREE.Float32BufferAttribute(sizes,1));
-        const mat = new THREE.ShaderMaterial({
-          transparent:true,
-          depthWrite:false,
-          blending:THREE.AdditiveBlending,
-          vertexColors:true,
-          uniforms:{ uTime:{value:0}, uPulse:{value:0}, uFocus:{value:0} },
-          vertexShader:`
-            attribute float size;
-            varying vec3 vColor;
-            uniform float uTime;
-            uniform float uPulse;
-            uniform float uFocus;
-            void main(){
-              vColor = color;
-              vec3 p = position;
-              float d = length(position.xy);
-              p.z += sin(uTime*0.5 + d*1.2) * 0.08;
-              p.x += sin(uTime*0.35 + position.y*2.1) * 0.03;
-              p.y += cos(uTime*0.28 + position.x*2.0) * 0.03;
-              vec4 mv = modelViewMatrix * vec4(p,1.0);
-              gl_PointSize = size * (240.0 / -mv.z) * (1.0 + uPulse*0.9 + uFocus*0.18);
-              gl_Position = projectionMatrix * mv;
-            }
-          `,
-          fragmentShader:`
-            varying vec3 vColor;
-            void main(){
-              vec2 uv = gl_PointCoord - 0.5;
-              float d = length(uv);
-              float alpha = smoothstep(0.5, 0.0, d);
-              gl_FragColor = vec4(vColor, alpha * 0.95);
-            }
-          `
-        });
-        const points = new THREE.Points(geo, mat);
-        g.add(points);
-
-        // add 2–3 shifted layers for volume
-        for(let i=1;i<opts.layers;i++){
-          const clone = points.clone();
-          clone.material = mat.clone();
-          clone.position.set((Math.random()-.5)*0.35, (Math.random()-.5)*0.35, (i - opts.layers/2) * 0.55);
-          clone.scale.setScalar(1 + i*0.01);
-          clone.material.uniforms = {
-            uTime:{value:0},
-            uPulse:{value:0},
-            uFocus:{value:0}
-          };
-          clone.material.opacity = 0.6 - i * 0.08;
-          g.add(clone);
-        }
-
-        // aura particles around plane
-        const aura = particleDust(url.includes('home') ? 900 : 1200, {x:w*opts.scale*1.2, y:h*opts.scale*1.2, z:4.8}, [[0.45,0.75,1],[1,0.79,0.52],[0.79,0.52,1],[0.5,1,0.78]]);
-        aura.position.z = -0.8;
-        g.add(aura);
-        g.userData.kind = 'particleImage';
-        resolve(g);
-      };
-      img.src = url;
+    const mat = new THREE.ShaderMaterial({
+      transparent:true, depthWrite:false, blending:THREE.AdditiveBlending, vertexColors:true,
+      uniforms:{uTime:{value:0},uEnergy:{value:0},uAlpha:{value:1},uTex:{value:pointTex}},
+      vertexShader:`
+        attribute float size; attribute float seed;
+        varying vec3 vColor; varying float vAlpha;
+        uniform float uTime; uniform float uEnergy; uniform float uAlpha;
+        void main(){
+          vec3 p = position;
+          p.x += sin(uTime*.4 + seed + position.y*.16)*(.02 + uEnergy*.05);
+          p.y += cos(uTime*.46 + seed*1.7 + position.x*.1)*(.018 + uEnergy*.04);
+          p.z += sin(uTime*.58 + seed)*(.05 + uEnergy*.12);
+          vec4 mv = modelViewMatrix * vec4(p,1.0);
+          gl_PointSize = size * (230.0/max(1.0,-mv.z));
+          gl_Position = projectionMatrix * mv;
+          vColor = color; vAlpha = uAlpha;
+        }`,
+      fragmentShader:`
+        uniform sampler2D uTex;
+        varying vec3 vColor; varying float vAlpha;
+        void main(){
+          float a = texture2D(uTex, gl_PointCoord).r;
+          if(a < .02) discard;
+          gl_FragColor = vec4(vColor, a*(.78 + a*.45)*vAlpha);
+        }`
     });
+    const points = new THREE.Points(geo,mat);
+
+    // Low-opacity ghost plane so the picture silhouette is readable.
+    const plane = new THREE.Mesh(
+      new THREE.PlaneGeometry(scale, scale*(img.height/img.width)),
+      new THREE.MeshBasicMaterial({
+        map: tex,
+        transparent:true,
+        opacity: opt.ghostOpacity || 0.16,
+        depthWrite:false,
+        blending:THREE.NormalBlending
+      })
+    );
+    plane.position.z = -0.25;
+
+    const aura = new THREE.Mesh(
+      new THREE.PlaneGeometry(scale*1.08, scale*(img.height/img.width)*1.08),
+      new THREE.MeshBasicMaterial({
+        color:new THREE.Color(opt.aura||0x8c6fff), transparent:true, opacity:.05,
+        blending:THREE.AdditiveBlending, depthWrite:false
+      })
+    );
+    aura.position.z = -.65;
+
+    const group = new THREE.Group();
+    group.add(aura); group.add(plane); group.add(points);
+    group.userData = {points, plane, aura};
+    return group;
   }
 
-  async function buildJourney(){
-    for(let i=0;i<imgConfigs.length;i++){
-      const conf = imgConfigs[i];
-      const group = new THREE.Group();
-      group.position.set(conf.x, conf.y, conf.z);
-      const xOffsets = conf.files.length === 1 ? [0] : conf.files.length === 2 ? [-4, 4] : [-5.5, 0, 5.5];
-      for(let j=0;j<conf.files.length;j++){
-        const sub = await buildParticleImage(conf.files[j], conf);
-        sub.position.x = xOffsets[j] || 0;
-        sub.position.y = (j % 2 === 0 ? 0.35 : -0.2);
-        sub.rotation.y = (j - (conf.files.length - 1)/2) * 0.12;
-        group.add(sub);
-      }
-      imageGroups.push(group);
-      world.add(group);
-    }
+  const stageRoot = new THREE.Group(); root.add(stageRoot);
+  const loader = new THREE.TextureLoader();
+  const files = {
+    galaxy:'space.jpg',
+    pod1:'spaceship.jpg',
+    pod2:'spaceship1.jpg',
+    pod3:'spaceship2.webp',
+    home1:'home1.jpg',
+    home2:'home2.jpg',
+    in1:'home3.jpg',
+    in2:'home4.jpg'
+  };
+
+  Promise.all(Object.values(files).map(src => new Promise((res,rej)=>loader.load(src,t=>res([src,t]),undefined,rej)))).then(items=>{
+    const tex = Object.fromEntries(items);
+
+    const galaxy = new THREE.Group();
+    const g = buildParticleImage(tex[files.galaxy], {scale:10.8, depth:2.5, sample:4, aura:0x9e79ff, ghostOpacity:.13});
+    galaxy.add(g); galaxy.position.z = stageZ[0];
+    stageRoot.add(galaxy);
+
+    const pod = new THREE.Group();
+    const p1 = buildParticleImage(tex[files.pod1], {scale:7.8, depth:1.5, sample:4, aura:0x69cfff, ghostOpacity:.18});
+    const p2 = buildParticleImage(tex[files.pod2], {scale:6.9, depth:1.4, sample:4, aura:0x7292ff, ghostOpacity:.18});
+    const p3 = buildParticleImage(tex[files.pod3], {scale:6.4, depth:1.3, sample:5, aura:0x88e0ff, ghostOpacity:.18});
+    p1.position.set(-3.3,.5,0); p2.position.set(2.6,-1.0,-1.1); p3.position.set(.2,1.9,-2.1);
+    pod.add(p1,p2,p3); pod.position.z = stageZ[1];
+    stageRoot.add(pod);
+
+    const outside = new THREE.Group();
+    const h1 = buildParticleImage(tex[files.home1], {scale:6.7, depth:1.25, sample:4, aura:0xffc7df, ghostOpacity:.19});
+    const h2 = buildParticleImage(tex[files.home2], {scale:6.35, depth:1.2, sample:4, aura:0xd2adff, ghostOpacity:.19});
+    h1.position.set(-2.8,.6,-.5); h2.position.set(3.0,-.35,-1.35);
+    outside.add(h1,h2); outside.position.z = stageZ[2];
+    stageRoot.add(outside);
+
+    const inside = new THREE.Group();
+    const i1 = buildParticleImage(tex[files.in1], {scale:6.7, depth:1.15, sample:4, aura:0xf3d29a, ghostOpacity:.21});
+    const i2 = buildParticleImage(tex[files.in2], {scale:6.4, depth:1.1, sample:4, aura:0xffa77d, ghostOpacity:.21});
+    i1.position.set(-2.15,.25,-.2); i2.position.set(2.8,-.15,-1.2);
+    inside.add(i1,i2); inside.position.z = stageZ[3];
+    stageRoot.add(inside);
+
+    stageRoot.userData.groups = [galaxy,pod,outside,inside];
+  }).catch(err=>console.error(err));
+
+  function updateUI(idx){
+    stagesUI.forEach((el,i)=>el.classList.toggle('active',i===idx));
+    label.textContent = stageMeta[idx][0];
+    sub.textContent = stageMeta[idx][1];
   }
 
-  const corridorDust = particleDust(2200, {x:18,y:14,z:98}, [[0.30,0.52,1],[0.72,0.45,1],[1,0.82,0.55]]);
-  world.add(corridorDust);
-
-  // trailing comets
-  const cometGroup = new THREE.Group();
-  world.add(cometGroup);
-  for(let i=0;i<12;i++){
-    const geo = new THREE.BufferGeometry();
-    const arr = new Float32Array(75*3);
-    for(let j=0;j<75;j++){
-      arr[j*3] = -j*0.05;
-      arr[j*3+1] = 0;
-      arr[j*3+2] = 0;
-    }
-    geo.setAttribute('position', new THREE.BufferAttribute(arr,3));
-    const mat = new THREE.PointsMaterial({ size:0.08, color:i%2?0x8f68ff:0x7ad4ff, transparent:true, opacity:0.65, depthWrite:false, blending:THREE.AdditiveBlending });
-    const comet = new THREE.Points(geo, mat);
-    comet.userData = { baseX:(Math.random()-.5)*16, baseY:(Math.random()-.5)*8, baseZ:-Math.random()*88, speed:0.3+Math.random()*0.6 };
-    cometGroup.add(comet);
-  }
-
-  // Mouse and input
-  function onMove(clientX, clientY){
-    mouse.x = (clientX / window.innerWidth) * 2 - 1;
-    mouse.y = (clientY / window.innerHeight);
-    mouse.targetProgress = Math.min(1, Math.max(0, Math.pow(mouse.y, 1.08)));
-  }
-  window.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
-  window.addEventListener('touchmove', (e) => { if(e.touches[0]) onMove(e.touches[0].clientX, e.touches[0].clientY); }, {passive:true});
-  window.addEventListener('wheel', (e) => {
-    mouse.extra += e.deltaY * 0.00022;
-    mouse.extra = Math.max(-0.2, Math.min(0.26, mouse.extra));
-  }, {passive:true});
-
-  // Resize
-  window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+  const bgm = document.getElementById('bgm');
+  const soundBtn = document.getElementById('sound');
+  let soundOn = false;
+  soundBtn.addEventListener('click', async ()=>{
+    try{
+      if(!soundOn){ await bgm.play(); soundOn = true; soundBtn.classList.add('on'); }
+      else { bgm.pause(); soundOn = false; soundBtn.classList.remove('on'); }
+    }catch(e){ console.warn(e); }
   });
 
-  function updateHearts(t, progress){
-    const w = heartsEl.clientWidth;
-    const h = heartsEl.clientHeight;
-    heartNodes.forEach((n, i) => {
-      const sign = i % 2 === 0 ? -1 : 1;
-      const a = n.angle + t * n.speed;
-      const x = sign * (Math.sin(a) * 0.42 + Math.sin(a * 2) * 0.1);
-      const y = Math.sin(a) * Math.cos(a) * 0.7;
-      const s = 0.65 + Math.sin(a + n.phase) * 0.18 + state.pulse * 0.45;
-      const px = w * 0.5 + x * w * 0.28 + mouse.x * 18 * n.depth;
-      const py = h * 0.5 + y * h * 0.34 - progress * 20 + Math.cos(a*1.7) * 10;
-      n.el.style.transform = `translate(${px}px,${py}px) scale(${s})`;
-      n.el.style.opacity = 0.18 + 0.55 * (0.5 + Math.sin(a + t * .5) * 0.5);
-    });
-  }
+  addEventListener('resize', ()=>{
+    renderer.setSize(innerWidth,innerHeight);
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+  });
 
-  function animate(now){
-    requestAnimationFrame(animate);
-    const t = now * 0.001;
-    const dt = Math.min(0.05, t - state.time || 0.016);
-    state.time = t;
+  let last = performance.now(), tA = 0, tB = Math.PI;
+  function tick(now){
+    requestAnimationFrame(tick);
+    const dt = Math.min(.033, (now-last)/1000); last = now;
 
-    if(analyser && soundOn){
-      analyser.getByteFrequencyData(dataArray);
-      let sum = 0;
-      for(let i=0;i<dataArray.length;i++) sum += dataArray[i];
-      state.audioLevel += ((sum / dataArray.length) / 255 - state.audioLevel) * 0.08;
-    } else {
-      state.audioLevel *= 0.95;
-    }
+    state.depth += (state.targetDepth - state.depth)*.06;
+    state.energy += ((((soundOn?0.18:0.08) + Math.abs(state.mx)*.05 + Math.abs(state.my)*.04)) - state.energy)*.06;
+    state.pulse *= .92;
 
-    state.pulse *= 0.94;
-    const target = Math.min(1, Math.max(0, mouse.targetProgress + mouse.extra));
-    state.progress += (target - state.progress) * 0.045;
-    updateOverlay(state.progress);
+    const depth = THREE.MathUtils.clamp(state.depth,0,3);
+    const idx = Math.round(depth);
+    updateUI(idx);
 
-    const desiredZ = THREE.MathUtils.lerp(SCENES[0].z + 8.5, SCENES[3].z + 9.8, state.progress);
-    camera.position.z += (desiredZ - camera.position.z) * 0.06;
-    camera.position.x += ((mouse.x * 1.65) - camera.position.x) * 0.04;
-    camera.position.y += (((0.5 - mouse.y) * 1.25) - camera.position.y) * 0.04;
-    camera.lookAt(mouse.x * 0.7, (0.5 - mouse.y) * 0.4, desiredZ - 18);
+    const camZ = THREE.MathUtils.lerp(8, -54, depth/3);
+    camera.position.z += (camZ - camera.position.z)*.06;
+    camera.position.x += ((state.mx*1.45) - camera.position.x)*.04;
+    camera.position.y += ((state.my*.88) - camera.position.y)*.04;
+    camera.lookAt(state.mx*.42, state.my*.26, camZ - 8);
 
-    world.rotation.y = Math.sin(t * 0.12) * 0.04 + mouse.x * 0.08;
-    world.rotation.x = Math.cos(t * 0.15) * 0.02 + (0.5 - mouse.y) * 0.06;
+    root.rotation.y = state.mx*.075;
+    root.rotation.x = -state.my*.038;
 
-    starsNear.material.uniforms.uTime.value = t;
-    starsNear.material.uniforms.uPulse.value = state.pulse + state.audioLevel;
-    starsFar.material.uniforms.uTime.value = t * 0.85;
-    starsFar.material.uniforms.uPulse.value = state.pulse * 0.5 + state.audioLevel * 0.5;
-    starsNear.rotation.y = t * 0.03;
-    starsFar.rotation.y = -t * 0.015;
+    tA += dt*.72; tB -= dt*.64;
+    const heartZ = THREE.MathUtils.lerp(stageZ[0], stageZ[3], depth/3) + 1.6;
+    const hs = 1 + state.energy*1.5 + state.pulse*.42;
+    heartBlue.position.set(Math.cos(tA)*1.15 + state.mx*.55, Math.sin(tA*1.2)*.35 + .22 + state.my*.18, heartZ + Math.sin(tA*1.1)*.4);
+    heartGreen.position.set(Math.cos(tB)*1.05 + state.mx*.5, Math.sin(tB*1.18)*.32 - .2 + state.my*.15, heartZ - .45 + Math.sin(tB*1.05)*.38);
+    heartBlue.scale.set(1.08*hs,1.08*hs,1);
+    heartGreen.scale.set(1.00*hs,1.00*hs,1);
 
-    heartGroup.rotation.z = t * 0.18;
-    heartGroup.rotation.y = Math.sin(t * 0.22) * 0.22;
-    heartGroup.position.z = camera.position.z - 14;
-    heartGroup.position.x = mouse.x * 1.1;
-    heartGroup.position.y = (0.5 - mouse.y) * 0.45;
-    blueHeart3D.material.size = 0.11 + state.audioLevel * 0.12 + state.pulse * 0.18;
-    greenHeart3D.material.size = 0.11 + state.audioLevel * 0.12 + state.pulse * 0.18;
-    blueHeart3D.material.opacity = 0.84;
-    greenHeart3D.material.opacity = 0.84;
+    galaxyDust.material.uniforms.uTime.value = now*.001;
+    galaxyDust.material.uniforms.uEnergy.value = state.energy + state.pulse*.4;
+    galaxyDust.rotation.y += 0.00035;
 
-    // per scene effects
-    imageGroups.forEach((g, idx) => {
-      const centerZ = imgConfigs[idx].z + 8.5;
-      const dz = Math.abs(camera.position.z - centerZ);
-      const focus = Math.max(0, 1 - dz / 16);
-      g.visible = dz < 28;
-      g.rotation.y = Math.sin(t * 0.14 + idx) * 0.08 + mouse.x * 0.12 * focus;
-      g.rotation.x = Math.cos(t * 0.16 + idx) * 0.03 + (0.5 - mouse.y) * 0.06 * focus;
-      g.position.x = Math.sin(t * 0.18 + idx * 0.8) * 0.5 + mouse.x * 0.55 * focus;
-      g.position.y = imgConfigs[idx].y + Math.cos(t * 0.22 + idx * 0.6) * 0.35 + (0.5 - mouse.y) * 0.5 * focus;
-      g.children.forEach(sub => {
-        sub.children?.forEach(child => {
-          if(child.material && child.material.uniforms){
-            child.material.uniforms.uTime.value = t;
-            child.material.uniforms.uPulse.value = state.audioLevel * 0.7 + state.pulse * 0.8;
-            child.material.uniforms.uFocus.value = focus;
-          }
-          if(child.material && child.material.opacity !== undefined && child.type === 'Points'){
-            child.material.opacity = 0.18 + 0.8 * focus;
+    const insideProgress = Math.max(0, Math.min(1, (depth - 2.2)/.8));
+    homeDust.material.uniforms.uTime.value = now*.001;
+    homeDust.material.uniforms.uEnergy.value = state.energy*.65 + insideProgress*.95 + state.pulse*.35;
+    homeDust.visible = insideProgress > .02;
+    homeDust.rotation.y -= .00025;
+
+    lightA.intensity = 1.3 + state.energy*1.8 + state.pulse*.7;
+    lightB.intensity = 1.15 + state.energy*1.55 + state.pulse*.65;
+    warmA.intensity = insideProgress * (1.6 + state.energy*1.15);
+    warmB.intensity = insideProgress * (1.25 + state.energy*1.05);
+
+    renderer.setClearColor(new THREE.Color(0x040611).lerp(new THREE.Color(0x221512), insideProgress*.45), 1);
+
+    if(stageRoot.userData.groups){
+      stageRoot.userData.groups.forEach((g,i)=>{
+        g.rotation.y = Math.sin(now*.00014+i)*.06 + state.mx*.07;
+        g.rotation.x = Math.cos(now*.00011+i)*.045 - state.my*.045;
+        g.children.forEach((child,j)=>{
+          child.position.y += Math.sin(now*.00045 + i*1.3 + j*.7)*.002;
+          if(child.userData && child.userData.points){
+            child.userData.points.material.uniforms.uTime.value = now*.001;
+            child.userData.points.material.uniforms.uEnergy.value = state.energy + state.pulse*.35;
+            child.userData.aura.material.opacity = .04 + state.energy*.05 + (i===3?insideProgress*.08:0);
+            child.userData.plane.material.opacity = (i===0?0.13:0.18) + state.energy*.03 + (i===3?insideProgress*.03:0);
+            child.rotation.y = Math.sin(now*.00018 + j)*.04;
           }
         });
       });
-    });
+    }
 
-    cometGroup.children.forEach((c, i) => {
-      const u = c.userData;
-      c.position.z = u.baseZ + ((t * u.speed * 10) % 92);
-      c.position.x = u.baseX + Math.sin(t * 0.8 + i) * 1.2;
-      c.position.y = u.baseY + Math.cos(t * 0.6 + i*0.5) * 0.9;
-      c.rotation.z = t * 0.3 + i;
-      c.material.opacity = 0.15 + 0.5 * Math.sin(t * 1.6 + i) ** 2;
-    });
-
-    updateHearts(t, state.progress);
-    renderer.render(scene, camera);
+    energyEl.textContent = 'ENERGY : ' + (state.energy + state.pulse).toFixed(2);
+    renderer.render(scene,camera);
   }
-
-  buildJourney().then(() => {
-    updateOverlay(0);
-    animate(0);
-  });
+  tick(performance.now());
 })();
 </script>
 </body>
