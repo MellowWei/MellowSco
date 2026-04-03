@@ -1,234 +1,345 @@
 <!DOCTYPE html>
 <html lang="zh">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>THE_GETAWAY</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: radial-gradient(circle at 50% 15%, #0b1020 0%, #05070d 45%, #010204 100%);
-      color: rgba(245,248,255,.9);
-      font-family: Georgia, "Times New Roman", serif;
-      cursor: none;
-    }
-    canvas { position: fixed; inset: 0; width: 100%; height: 100%; display: block; }
-    #ui { position: fixed; inset: 0; pointer-events: none; }
-    #title {
-      position: absolute; top: 24px; left: 50%; transform: translateX(-50%);
-      font-size: 12px; letter-spacing: .52em; white-space: nowrap;
-    }
-    #timeline {
-      position: absolute; left: 24px; top: 72px; font: 10px "Courier New", monospace;
-      letter-spacing: .18em; color: rgba(230,236,255,.68);
-    }
-    .stage { display: flex; gap: 10px; align-items: center; opacity: .25; transition: .35s; }
-    .stage.active { opacity: 1; transform: translateX(8px); }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.22); }
-    .stage.active .dot { background: linear-gradient(135deg, #6caeff, #d191ff); }
-    #hud {
-      position: absolute; top: 24px; right: 24px; text-align: right;
-      font: 10px "Courier New", monospace; letter-spacing: .16em; line-height: 1.8;
-      color: rgba(220,228,255,.72);
-    }
-    #label {
-      position: absolute; left: 50%; bottom: 92px; transform: translateX(-50%);
-      font-size: 22px; letter-spacing: .34em; white-space: nowrap;
-    }
-    #sub {
-      position: absolute; left: 50%; bottom: 64px; transform: translateX(-50%);
-      font: 9px "Courier New", monospace; letter-spacing: .22em; color: rgba(223,229,255,.54);
-      white-space: nowrap;
-    }
-    #hint {
-      position: absolute; left: 50%; bottom: 24px; transform: translateX(-50%);
-      font: 8px "Courier New", monospace; letter-spacing: .2em; color: rgba(255,255,255,.24);
-      white-space: nowrap;
-    }
-    #cursor1, #cursor2 {
-      position: fixed; pointer-events: none; transform: translate(-50%, -50%); border-radius: 50%;
-    }
-    #cursor1 { width: 6px; height: 6px; background: white; }
-    #cursor2 { width: 22px; height: 22px; border: 1px solid rgba(220,228,255,.18); }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>THE_GETAWAY</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    width:100%;height:100%;overflow:hidden;cursor:none;background:#04050a;color:#fff;
+    font-family:"Hiragino Mincho ProN","Times New Roman",serif;
+  }
+  canvas{position:fixed;inset:0;display:block}
+  #ui{position:fixed;inset:0;pointer-events:none;z-index:5}
+  #title{
+    position:absolute;top:24px;left:50%;transform:translateX(-50%);
+    font-size:12px;letter-spacing:.52em;color:rgba(245,248,255,.82);white-space:nowrap
+  }
+  #sound{
+    position:absolute;top:20px;left:22px;width:30px;height:30px;border-radius:50%;
+    border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.03);color:#fff;
+    pointer-events:auto
+  }
+  #sound.on{box-shadow:0 0 18px rgba(120,170,255,.18)}
+  #hud{
+    position:absolute;top:22px;right:24px;text-align:right;
+    font:10px "Courier New",monospace;letter-spacing:.16em;line-height:1.8;color:rgba(220,228,255,.72)
+  }
+  #timeline{
+    position:absolute;left:22px;top:72px;font:10px "Courier New",monospace;letter-spacing:.18em;color:rgba(230,236,255,.62)
+  }
+  .stage{display:flex;gap:10px;align-items:center;opacity:.22;transition:.35s}
+  .stage.active{opacity:1;transform:translateX(8px)}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.2)}
+  .stage.active .dot{background:linear-gradient(135deg,#6caeff,#d191ff)}
+  #label{
+    position:absolute;bottom:88px;left:50%;transform:translateX(-50%);
+    font-size:22px;letter-spacing:.34em;color:rgba(252,253,255,.9)
+  }
+  #sub{
+    position:absolute;bottom:60px;left:50%;transform:translateX(-50%);
+    font:9px "Courier New",monospace;letter-spacing:.22em;color:rgba(223,229,255,.54)
+  }
+  #hint{
+    position:absolute;bottom:22px;left:50%;transform:translateX(-50%);
+    font:8px "Courier New",monospace;letter-spacing:.2em;color:rgba(255,255,255,.24);white-space:nowrap
+  }
+  #cursor1,#cursor2{
+    position:fixed;pointer-events:none;z-index:10;transform:translate(-50%,-50%);border-radius:50%
+  }
+  #cursor1{width:6px;height:6px;background:#fff}
+  #cursor2{width:22px;height:22px;border:1px solid rgba(220,228,255,.18)}
+</style>
 </head>
 <body>
-  <canvas id="c"></canvas>
-  <div id="ui">
-    <div id="title">T H E _ G E T A W A Y</div>
-    <div id="timeline">
-      <div class="stage active"><span class="dot"></span><span>GALAXY</span></div>
-      <div class="stage"><span class="dot"></span><span>SPACE POD</span></div>
-      <div class="stage"><span class="dot"></span><span>OUTSIDE HOME</span></div>
-      <div class="stage"><span class="dot"></span><span>INSIDE HOME</span></div>
-    </div>
-    <div id="hud">
-      <div>ARCHIVE : 77347 / 44271</div>
-      <div>FIELD : BLUE HEART × GREEN HEART</div>
-      <div id="energy">ENERGY : 0.00</div>
-    </div>
-    <div id="label">GALAXY</div>
-    <div id="sub">ultrafine particle field</div>
-    <div id="hint">鼠标上下 = 真正进入空间 ｜ 左右 = 视差 ｜ 蓝心 / 绿心 = 引力核</div>
+<canvas id="c"></canvas>
+<div id="ui">
+  <div id="title">T H E _ G E T A W A Y</div>
+  <button id="sound">♪</button>
+  <div id="timeline">
+    <div class="stage active"><span class="dot"></span><span>GALAXY</span></div>
+    <div class="stage"><span class="dot"></span><span>SPACE POD</span></div>
+    <div class="stage"><span class="dot"></span><span>OUTSIDE HOME</span></div>
+    <div class="stage"><span class="dot"></span><span>INSIDE HOME</span></div>
   </div>
-  <div id="cursor1"></div>
-  <div id="cursor2"></div>
+  <div id="hud">
+    <div>ARCHIVE : 77347 / 44271</div>
+    <div>FIELD : BLUE HEART × GREEN HEART</div>
+    <div id="energy">ENERGY : 0.00</div>
+  </div>
+  <div id="label">GALAXY</div>
+  <div id="sub">gravitational hearts · real space entry</div>
+  <div id="hint">鼠标上下 = 真正进入空间 ｜ 左右 = 视差 ｜ 蓝心 / 绿心 = 前景引力核</div>
+</div>
+<div id="cursor1"></div><div id="cursor2"></div>
+<audio id="bgm" src="winter_sun.m4a" preload="auto" loop></audio>
+<script>
+(() => {
+  const canvas = document.getElementById('c');
+  const ctx = canvas.getContext('2d');
+  const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
-  <script>
-    const canvas = document.getElementById('c');
-    const ctx = canvas.getContext('2d');
-    const cursor1 = document.getElementById('cursor1');
-    const cursor2 = document.getElementById('cursor2');
-    const stages = [...document.querySelectorAll('.stage')];
-    const label = document.getElementById('label');
-    const sub = document.getElementById('sub');
-    const energy = document.getElementById('energy');
+  const uiStages = [...document.querySelectorAll('.stage')];
+  const label = document.getElementById('label');
+  const sub = document.getElementById('sub');
+  const energyText = document.getElementById('energy');
+  const cursor1 = document.getElementById('cursor1');
+  const cursor2 = document.getElementById('cursor2');
+  const bgm = document.getElementById('bgm');
+  const soundBtn = document.getElementById('sound');
 
-    const stageDefs = [
-      ['GALAXY', 'ultrafine galaxy field'],
-      ['SPACE POD', 'glass orbit · vessel of arrival'],
-      ['OUTSIDE HOME', 'garden threshold · flowering gravity'],
-      ['INSIDE HOME', 'warm interior · sea-facing return']
-    ];
+  const state = {
+    w: innerWidth, h: innerHeight,
+    mx: 0, my: 0,
+    targetDepth: 0, depth: 0,
+    energy: 0, pulse: 0,
+    soundOn: false
+  };
 
-    let w = 0, h = 0, dpr = 1, t = 0;
-    let mx = 0.5, my = 0.5, depthTarget = 0, depth = 0;
+  const stages = [
+    {name:'GALAXY', sub:'blue-black seed × violet-gold drift'},
+    {name:'SPACE POD', sub:'glass orbit · vessel of arrival'},
+    {name:'OUTSIDE HOME', sub:'garden threshold · flowering gravity'},
+    {name:'INSIDE HOME', sub:'warm sunset room · sea-facing return'}
+  ];
 
-    function resize() {
-      dpr = Math.min(window.devicePixelRatio || 1, 2);
-      w = innerWidth; h = innerHeight;
-      canvas.width = w * dpr; canvas.height = h * dpr;
-      canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    }
+  let groups = [];
+  const stars = [];
+  const warmDust = [];
+  let time = 0;
 
-    function moveCursor(x, y) {
-      cursor1.style.left = cursor2.style.left = x + 'px';
-      cursor1.style.top = cursor2.style.top = y + 'px';
-    }
+  function resize() {
+    state.w = innerWidth; state.h = innerHeight;
+    canvas.width = Math.round(state.w * DPR);
+    canvas.height = Math.round(state.h * DPR);
+    canvas.style.width = state.w + 'px';
+    canvas.style.height = state.h + 'px';
+    ctx.setTransform(DPR,0,0,DPR,0,0);
+  }
 
-    const galaxy = Array.from({ length: 2600 }, () => ({
-      a: Math.random() * Math.PI * 2,
-      r: Math.pow(Math.random(), 0.62) * Math.min(innerWidth, innerHeight) * 0.42,
-      s: Math.random() * 0.7 + 0.1,
-      z: Math.random() * 1200,
-      c: ['#6aa9ff', '#8967ff', '#f3c06c', '#83eeff'][Math.floor(Math.random() * 4)]
-    }));
+  function moveCursor(x,y){
+    cursor1.style.left = cursor2.style.left = x + 'px';
+    cursor1.style.top = cursor2.style.top = y + 'px';
+  }
 
-    const field = Array.from({ length: 1800 }, () => ({
-      x: (Math.random() - .5) * 2200,
-      y: (Math.random() - .5) * 1200,
-      z: Math.random() * 2200,
-      s: Math.random() * .55 + .08,
-      c: ['#6aa9ff', '#8967ff', '#f3c06c', '#83eeff'][Math.floor(Math.random() * 4)]
-    }));
+  function updateUI(idx){
+    uiStages.forEach((el,i)=>el.classList.toggle('active', i===idx));
+    label.textContent = stages[idx].name;
+    sub.textContent = stages[idx].sub;
+  }
 
-    const clouds = [
-      { stage: 1, x: -220, y: 40, z: 0, color: 'rgba(110,210,255,0.08)' },
-      { stage: 1, x: 230, y: -70, z: -120, color: 'rgba(130,160,255,0.08)' },
-      { stage: 2, x: -250, y: 30, z: 0, color: 'rgba(255,200,220,0.06)' },
-      { stage: 2, x: 255, y: -15, z: -110, color: 'rgba(220,170,255,0.06)' },
-      { stage: 3, x: -220, y: 0, z: 0, color: 'rgba(255,220,170,0.07)' },
-      { stage: 3, x: 235, y: -8, z: -100, color: 'rgba(255,170,120,0.07)' }
-    ];
-
-    function project(x, y, z, camZ) {
-      const f = 1150 / Math.max(240, (z - camZ) + 1150);
-      return { x: w / 2 + x * f, y: h / 2 + y * f, s: f };
-    }
-
-    function setStage(i) {
-      stages.forEach((el, idx) => el.classList.toggle('active', idx === i));
-      label.textContent = stageDefs[i][0];
-      sub.textContent = stageDefs[i][1];
-    }
-
-    function drawGlow(x, y, r, color) {
-      const g = ctx.createRadialGradient(x, y, 0, x, y, r);
-      g.addColorStop(0, color);
-      g.addColorStop(1, color.replace(/[^,]+\)$/,'0)'));
-      ctx.fillStyle = g;
-      ctx.beginPath();
-      ctx.arc(x, y, r, 0, Math.PI * 2);
-      ctx.fill();
-    }
-
-    function render() {
-      t += 0.005;
-      depth += (depthTarget - depth) * 0.08;
-      const stage = Math.round(Math.max(0, Math.min(3, depth)));
-      setStage(stage);
-      const camZ = depth * 520;
-      const parX = (mx - 0.5) * 180;
-      const parY = (my - 0.5) * 120;
-
-      ctx.clearRect(0, 0, w, h);
-      const bg = ctx.createLinearGradient(0, 0, 0, h);
-      bg.addColorStop(0, '#02030a');
-      bg.addColorStop(1, depth > 2.3 ? '#20140f' : '#0a0d18');
-      ctx.fillStyle = bg;
-      ctx.fillRect(0, 0, w, h);
-
-      for (const p of field) {
-        const q = project(p.x + parX * 0.12, p.y + parY * 0.12, p.z, camZ * 0.35);
-        ctx.globalAlpha = 0.05 + q.s * 0.12;
-        ctx.fillStyle = p.c;
-        ctx.beginPath();
-        ctx.arc(q.x, q.y, p.s * Math.max(0.16, q.s), 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      const gx = w * 0.5 + parX * 0.15;
-      const gy = h * 0.42 + parY * 0.12;
-      for (const p of galaxy) {
-        const arm = p.a + Math.log(1 + p.r * 0.02) * 2.2 + t * 0.22;
-        const x = gx + Math.cos(arm) * p.r;
-        const y = gy + Math.sin(arm) * p.r * 0.48;
-        ctx.globalAlpha = 0.04 + (1 - p.r / (Math.min(w,h)*0.42)) * 0.18;
-        ctx.fillStyle = p.c;
-        ctx.beginPath();
-        ctx.arc(x, y, p.s, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      const blue = project(Math.cos(t * 1.1) * 120 + parX * 0.1, Math.sin(t * 1.3) * 34 + 20 + parY * 0.08, depth * 420, camZ);
-      const green = project(Math.cos(-t * 1.0) * 110 + parX * 0.08, Math.sin(-t * 1.2) * 28 - 16 + parY * 0.06, depth * 420 - 24, camZ);
-      drawGlow(blue.x, blue.y, 20 * blue.s, 'rgba(100,166,255,0.42)');
-      drawGlow(green.x, green.y, 18 * green.s, 'rgba(100,255,175,0.40)');
-
-      for (const c of clouds) {
-        const d = c.stage - depth;
-        const vis = Math.max(0, 1 - Math.abs(d) * 1.05);
-        if (vis < 0.02) continue;
-        const p = project(c.x + parX * 0.14, c.y + parY * 0.10, c.stage * 520 + c.z + d * 340, camZ);
-        ctx.globalAlpha = vis * 0.9;
-        const g = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, 180 * p.s);
-        g.addColorStop(0, c.color);
-        g.addColorStop(1, c.color.replace(/[^,]+\)$/,'0)'));
-        ctx.fillStyle = g;
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, 180 * p.s, 0, Math.PI * 2);
-        ctx.fill();
-      }
-
-      energy.textContent = 'ENERGY : ' + (Math.abs(depthTarget - depth) + 0.15).toFixed(2);
-      requestAnimationFrame(render);
-    }
-
-    window.addEventListener('mousemove', (e) => {
-      mx = e.clientX / w;
-      my = e.clientY / h;
-      depthTarget = my * 3;
-      moveCursor(e.clientX, e.clientY);
+  function loadImage(src){
+    return new Promise((resolve,reject)=>{
+      const img = new Image();
+      img.onload = ()=>resolve(img);
+      img.onerror = reject;
+      img.src = src;
     });
+  }
 
-    window.addEventListener('resize', resize);
+  const hc = document.createElement('canvas');
+  const hctx = hc.getContext('2d', {willReadFrequently:true});
+
+  function buildParticleBody(img, width, depth){
+    const sample = Math.max(2, img.width > 1200 ? 5 : 4);
+    hc.width = img.width; hc.height = img.height;
+    hctx.clearRect(0,0,img.width,img.height);
+    hctx.drawImage(img,0,0);
+    const data = hctx.getImageData(0,0,img.width,img.height).data;
+    const ratio = img.height / img.width;
+    const height = width * ratio;
+    const back = [], mid = [], front = [];
+
+    for(let y=0;y<img.height;y+=sample){
+      for(let x=0;x<img.width;x+=sample){
+        const i=(y*img.width+x)*4;
+        const a=data[i+3]/255;
+        if(a < .12) continue;
+        const r=data[i]/255, g=data[i+1]/255, b=data[i+2]/255;
+        const lum=(r+g+b)/3;
+        if(lum < .03) continue;
+        if(Math.random() > 0.72 + lum*0.20) continue;
+
+        const cx = Math.abs(x/img.width - .5);
+        const cy = Math.abs(y/img.height - .5);
+        const center = 1 - Math.max(cx,cy)*1.32;
+
+        const p = {
+          x:(x/img.width-.5)*width,
+          y:-(y/img.height-.5)*height,
+          z:(Math.random()-.5)*depth*Math.max(.22, center + lum*.9),
+          r,g,b,
+          a:.58 + lum*.16,
+          size:.08 + lum*.22 + Math.random()*.05,
+          seed:Math.random()*Math.PI*2
+        };
+        if(lum > .7) front.push(p);
+        else if(lum > .36) mid.push(p);
+        else back.push(p);
+      }
+    }
+    return {width,height,back,mid,front};
+  }
+
+  function project(x,y,z,camZ){
+    const dz = z - camZ;
+    const f = 1180 / Math.max(220, dz + 1180);
+    return {x: state.w/2 + x*f, y: state.h/2 + y*f, s:f};
+  }
+
+  function glow(x,y,r,rgba,alpha=1){
+    const g = ctx.createRadialGradient(x,y,0,x,y,r);
+    g.addColorStop(0, rgba.replace('ALPHA', String(alpha)));
+    g.addColorStop(1, rgba.replace('ALPHA', '0'));
+    ctx.fillStyle = g;
+    ctx.beginPath(); ctx.arc(x,y,r,0,Math.PI*2); ctx.fill();
+  }
+
+  function drawLayer(layer, gx, gy, gz, camZ, vis, strength, spreadMul){
+    for(const p of layer){
+      const px = gx + p.x + Math.sin(time*.72 + p.seed) * (.45 + strength*.75) * spreadMul;
+      const py = gy + p.y + Math.cos(time*.61 + p.seed*1.7) * (.45 + strength*.68) * spreadMul;
+      const pz = gz + p.z + Math.sin(time*.82 + p.seed) * (.8 + strength*1.35) * spreadMul;
+      const pr = project(px,py,pz,camZ);
+      if(pr.x < -4 || pr.x > state.w+4 || pr.y < -4 || pr.y > state.h+4) continue;
+      const r = p.size * Math.max(.12, pr.s);
+      ctx.globalAlpha = p.a * vis;
+      ctx.fillStyle = `rgba(${Math.round(p.r*255)},${Math.round(p.g*255)},${Math.round(p.b*255)},1)`;
+      ctx.beginPath(); ctx.arc(pr.x,pr.y,r,0,Math.PI*2); ctx.fill();
+    }
+  }
+
+  function seedBackground(){
+    for(let i=0;i<2800;i++){
+      stars.push({
+        x:(Math.random()-.5)*3200,
+        y:(Math.random()-.5)*1800,
+        z:Math.random()*3400,
+        c:['#4f7fff','#8d65ff','#f4be76','#7fe9ff','#bb83ff'][Math.floor(Math.random()*5)],
+        s:.06 + Math.random()*.45
+      });
+    }
+    for(let i=0;i<1000;i++){
+      warmDust.push({
+        x:(Math.random()-.5)*900,
+        y:(Math.random()-.5)*540,
+        z:Math.random()*500,
+        c:['#ffd9ad','#ffb68b','#fff2dd','#f5c9a8'][Math.floor(Math.random()*4)],
+        s:.06 + Math.random()*.40
+      });
+    }
+  }
+
+  async function init(){
     resize();
+    moveCursor(state.w/2, state.h/2);
+    seedBackground();
+    const imageDefs = [
+      {src:'space.jpg', stage:0, x:0, y:0, z:0, width:940, depth:120, tint:'rgba(160,120,255,0.08)'},
+      {src:'spaceship.jpg', stage:1, x:-280, y:40, z:0, width:420, depth:42, tint:'rgba(100,210,255,0.06)'},
+      {src:'spaceship1.jpg', stage:1, x:270, y:-90, z:-140, width:360, depth:40, tint:'rgba(120,150,255,0.06)'},
+      {src:'spaceship2.webp', stage:1, x:0, y:190, z:-220, width:310, depth:36, tint:'rgba(120,240,255,0.05)'},
+      {src:'home1.jpg', stage:2, x:-270, y:28, z:0, width:390, depth:28, tint:'rgba(255,190,220,0.05)'},
+      {src:'home2.jpg', stage:2, x:280, y:-20, z:-120, width:360, depth:26, tint:'rgba(220,170,255,0.05)'},
+      {src:'home3.jpg', stage:3, x:-220, y:0, z:0, width:370, depth:22, tint:'rgba(255,220,150,0.06)'},
+      {src:'home4.jpg', stage:3, x:240, y:-10, z:-110, width:350, depth:22, tint:'rgba(255,170,120,0.06)'},
+    ];
+    const loaded = await Promise.all(imageDefs.map(async d => ({...d, img: await loadImage(d.src)})));
+    groups = loaded.map(d => ({...d, body: buildParticleBody(d.img, d.width, d.depth)}));
     render();
-  })();
+  }
+
+  addEventListener('resize', resize);
+  addEventListener('mousemove', e=>{
+    const x=e.clientX/state.w, y=e.clientY/state.h;
+    state.mx=(x-.5)*2; state.my=-(y-.5)*2; state.targetDepth=y*3;
+    moveCursor(e.clientX,e.clientY);
+  });
+  addEventListener('dblclick', ()=> state.pulse=1);
+
+  soundBtn.addEventListener('click', async ()=>{
+    try{
+      if(!state.soundOn){ await bgm.play(); state.soundOn=true; soundBtn.classList.add('on');}
+      else { bgm.pause(); state.soundOn=false; soundBtn.classList.remove('on');}
+    }catch(e){}
+  });
+
+  function render(){
+    requestAnimationFrame(render);
+    time += .016;
+
+    state.depth += (state.targetDepth - state.depth)*.08;
+    state.energy += ((((state.soundOn?.18:.08)+Math.abs(state.mx)*.05+Math.abs(state.my)*.04)) - state.energy)*.06;
+    state.pulse *= .92;
+
+    const depth = Math.max(0, Math.min(3, state.depth));
+    const idx = Math.round(depth);
+    updateUI(idx);
+    const inside = Math.max(0, Math.min(1, (depth-2.2)/.8));
+
+    const bg = ctx.createLinearGradient(0,0,0,state.h);
+    bg.addColorStop(0,'#02030a');
+    bg.addColorStop(.55,'#070a14');
+    bg.addColorStop(1, inside>0 ? '#20140f' : '#0b0f1b');
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,state.w,state.h);
+
+    const camZ = depth * 560;
+    const parX = state.mx * 94;
+    const parY = -state.my * 56;
+
+    for(const s of stars){
+      const p = project(s.x + parX*.12, s.y + parY*.12, s.z, camZ*.28);
+      if(p.x < -4 || p.x > state.w+4 || p.y < -4 || p.y > state.h+4) continue;
+      ctx.globalAlpha = .035 + p.s*.11;
+      ctx.fillStyle = s.c;
+      ctx.beginPath(); ctx.arc(p.x,p.y,s.s*Math.max(.14,p.s),0,Math.PI*2); ctx.fill();
+    }
+
+    const heartBaseZ = depth * 460;
+    const hb = project(Math.cos(time*.72)*132 + parX*.08, Math.sin(time*.86)*42 + 26 + parY*.05, heartBaseZ + Math.sin(time)*28, camZ);
+    const hg = project(Math.cos(time*-.64)*120 + parX*.06, Math.sin(time*-.78)*36 - 22 + parY*.05, heartBaseZ - 42 + Math.sin(time*.9)*24, camZ);
+    glow(hb.x,hb.y,18*hb.s*(1+state.energy*.35),'rgba(98,166,255,ALPHA)',.36);
+    glow(hg.x,hg.y,16*hg.s*(1+state.energy*.35),'rgba(100,255,175,ALPHA)',.34);
+
+    for(const g of groups){
+      const d = g.stage - depth;
+      const vis = Math.max(0, 1 - Math.abs(d)*1.15);
+      if(vis < .01) continue;
+
+      const gz = g.stage*560 + g.z + d*360;
+      const gx = g.x + parX*(.12 + g.stage*.02);
+      const gy = g.y + parY*(.10 + g.stage*.02);
+
+      const ap = project(gx, gy, gz-16, camZ);
+      ctx.globalAlpha = .13 * vis;
+      ctx.fillStyle = g.tint;
+      ctx.beginPath();
+      ctx.ellipse(ap.x, ap.y, g.body.width*.36*ap.s, g.body.height*.36*ap.s, 0, 0, Math.PI*2);
+      ctx.fill();
+
+      drawLayer(g.body.back, gx, gy, gz-22, camZ, vis*.50, state.energy, 1.0);
+      drawLayer(g.body.mid, gx, gy, gz, camZ, vis*.74, state.energy, 1.03);
+      drawLayer(g.body.front, gx, gy, gz+22, camZ, vis, state.energy + state.pulse*.15, 1.05);
+    }
+
+    if(inside > .02){
+      for(const d of warmDust){
+        const p = project(d.x + parX*.06, d.y + parY*.06, 1680 + d.z, camZ);
+        if(p.x < -4 || p.x > state.w+4 || p.y < -4 || p.y > state.h+4) continue;
+        ctx.globalAlpha = inside*.10;
+        ctx.fillStyle = d.c;
+        ctx.beginPath(); ctx.arc(p.x,p.y,d.s*Math.max(.14,p.s),0,Math.PI*2); ctx.fill();
+      }
+    }
+
+    ctx.globalAlpha = 1;
+    energyText.textContent = 'ENERGY : ' + (state.energy + state.pulse).toFixed(2);
+  }
+
+  init();
+})();
 </script>
 </body>
 </html>
