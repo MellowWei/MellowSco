@@ -5,69 +5,64 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>THE_GETAWAY</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{
-  width:100%;height:100%;overflow:hidden;cursor:none;
-  background:
-    radial-gradient(circle at 50% 15%, rgba(255,226,150,.07), transparent 18%),
-    radial-gradient(circle at 18% 16%, rgba(91,136,255,.10), transparent 30%),
-    radial-gradient(circle at 82% 22%, rgba(177,108,255,.09), transparent 26%),
-    linear-gradient(180deg,#02030a 0%,#070a15 45%,#0b0f1b 100%);
-  color:#fff;
-  font-family:"Hiragino Mincho ProN","Times New Roman",serif;
-}
-canvas{position:fixed;inset:0;display:block}
-#ui{position:fixed;inset:0;pointer-events:none;z-index:5}
-#title{
-  position:absolute;top:24px;left:50%;transform:translateX(-50%);
-  font-size:clamp(11px,1.1vw,14px);letter-spacing:.48em;color:rgba(242,246,255,.82);
-  text-shadow:0 0 22px rgba(104,149,255,.38),0 0 34px rgba(170,108,255,.22);white-space:nowrap;
-}
-#sound{
-  position:absolute;top:22px;left:24px;width:30px;height:30px;border-radius:999px;
-  border:1px solid rgba(208,220,255,.18);background:rgba(255,255,255,.03);
-  color:rgba(255,255,255,.76);display:grid;place-items:center;
-  pointer-events:auto;font-size:12px;
-}
-#sound.on{border-color:rgba(154,190,255,.45);box-shadow:0 0 18px rgba(106,169,255,.18)}
-#hud{
-  position:absolute;top:24px;right:24px;text-align:right;
-  font-family:"Courier New",monospace;font-size:10px;letter-spacing:.16em;line-height:1.85;
-  color:rgba(220,228,255,.78)
-}
-#hud .muted{color:rgba(180,192,255,.52)}
-#timeline{
-  position:absolute;left:24px;top:72px;font-family:"Courier New",monospace;
-  font-size:10px;letter-spacing:.18em;color:rgba(230,236,255,.74)
-}
-.stage{display:flex;gap:10px;align-items:center;opacity:.26;transform:translateX(0);transition:.35s}
-.stage.active{opacity:1;transform:translateX(8px);text-shadow:0 0 16px rgba(176,140,255,.24)}
-.dot{width:8px;height:8px;border-radius:50%;background:rgba(220,232,255,.22)}
-.stage.active .dot{background:linear-gradient(135deg,#6caeff,#d191ff);box-shadow:0 0 12px rgba(129,183,255,.4)}
-#label{
-  position:absolute;bottom:92px;left:50%;transform:translateX(-50%);
-  font-size:clamp(16px,1.85vw,24px);letter-spacing:.34em;color:rgba(252,253,255,.94);
-  text-shadow:0 0 22px rgba(112,154,255,.28),0 0 34px rgba(172,108,255,.2);white-space:nowrap;
-}
-#sub{
-  position:absolute;bottom:64px;left:50%;transform:translateX(-50%);
-  font-family:"Courier New",monospace;font-size:9px;letter-spacing:.22em;color:rgba(223,229,255,.56);white-space:nowrap;
-}
-#hint{
-  position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
-  font-family:"Courier New",monospace;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,.26);white-space:nowrap;
-}
-#cursor1,#cursor2{
-  position:fixed;pointer-events:none;z-index:10;transform:translate(-50%,-50%);border-radius:50%;
-}
-#cursor1{width:6px;height:6px;background:#fff}
-#cursor2{width:22px;height:22px;border:1px solid rgba(220,228,255,.18)}
-@media (max-width:800px){
-  #timeline{font-size:9px}
-  #label{bottom:102px}
-  #sub{bottom:74px}
-  #hint{width:92vw;white-space:normal;line-height:1.6;text-align:center}
-}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{
+    width:100%;height:100%;overflow:hidden;cursor:none;
+    background:
+      radial-gradient(circle at 50% 12%, rgba(255,220,150,.06), transparent 18%),
+      radial-gradient(circle at 18% 16%, rgba(85,130,255,.08), transparent 28%),
+      radial-gradient(circle at 82% 20%, rgba(175,100,255,.08), transparent 24%),
+      linear-gradient(180deg,#02030a 0%,#060913 50%,#0a0d18 100%);
+    color:#fff;font-family:"Hiragino Mincho ProN","Times New Roman",serif;
+  }
+  canvas{position:fixed;inset:0;display:block}
+  #ui{position:fixed;inset:0;pointer-events:none;z-index:5}
+  #title{
+    position:absolute;top:24px;left:50%;transform:translateX(-50%);
+    font-size:clamp(11px,1.1vw,14px);letter-spacing:.48em;color:rgba(242,246,255,.82);
+    text-shadow:0 0 22px rgba(104,149,255,.28),0 0 34px rgba(170,108,255,.16);white-space:nowrap;
+  }
+  #sound{
+    position:absolute;top:22px;left:24px;width:30px;height:30px;border-radius:999px;
+    border:1px solid rgba(208,220,255,.18);background:rgba(255,255,255,.03);
+    color:rgba(255,255,255,.76);display:grid;place-items:center;pointer-events:auto;font-size:12px;
+  }
+  #sound.on{border-color:rgba(154,190,255,.45);box-shadow:0 0 18px rgba(106,169,255,.18)}
+  #hud{
+    position:absolute;top:24px;right:24px;text-align:right;
+    font-family:"Courier New",monospace;font-size:10px;letter-spacing:.16em;line-height:1.85;color:rgba(220,228,255,.78)
+  }
+  #hud .muted{color:rgba(180,192,255,.52)}
+  #timeline{
+    position:absolute;left:24px;top:72px;font-family:"Courier New",monospace;
+    font-size:10px;letter-spacing:.18em;color:rgba(230,236,255,.74)
+  }
+  .stage{display:flex;gap:10px;align-items:center;opacity:.26;transform:translateX(0);transition:.35s}
+  .stage.active{opacity:1;transform:translateX(8px);text-shadow:0 0 16px rgba(176,140,255,.24)}
+  .dot{width:8px;height:8px;border-radius:50%;background:rgba(220,232,255,.22)}
+  .stage.active .dot{background:linear-gradient(135deg,#6caeff,#d191ff);box-shadow:0 0 12px rgba(129,183,255,.4)}
+  #label{
+    position:absolute;bottom:92px;left:50%;transform:translateX(-50%);
+    font-size:clamp(16px,1.85vw,24px);letter-spacing:.34em;color:rgba(252,253,255,.94);
+    text-shadow:0 0 22px rgba(112,154,255,.22),0 0 34px rgba(172,108,255,.14);white-space:nowrap;
+  }
+  #sub{
+    position:absolute;bottom:64px;left:50%;transform:translateX(-50%);
+    font-family:"Courier New",monospace;font-size:9px;letter-spacing:.22em;color:rgba(223,229,255,.56);white-space:nowrap;
+  }
+  #hint{
+    position:absolute;bottom:24px;left:50%;transform:translateX(-50%);
+    font-family:"Courier New",monospace;font-size:8px;letter-spacing:.2em;color:rgba(255,255,255,.26);white-space:nowrap;
+  }
+  #cursor1,#cursor2{position:fixed;pointer-events:none;z-index:10;transform:translate(-50%,-50%);border-radius:50%}
+  #cursor1{width:6px;height:6px;background:#fff}
+  #cursor2{width:22px;height:22px;border:1px solid rgba(220,228,255,.18)}
+  @media (max-width:800px){
+    #timeline{font-size:9px}
+    #label{bottom:102px}
+    #sub{bottom:74px}
+    #hint{width:92vw;white-space:normal;line-height:1.6;text-align:center}
+  }
 </style>
 </head>
 <body>
@@ -88,8 +83,8 @@ canvas{position:fixed;inset:0;display:block}
     <div class="muted">MOUSE ↓ : ENTER DEEPER</div>
   </div>
   <div id="label">GALAXY</div>
-  <div id="sub">particle image bodies · narrative depth enabled</div>
-  <div id="hint">鼠标上下移动会真正进入不同空间 ｜ 纯粒子图像体 ｜ 左右移动 = 视差 ｜ 左上角 = 声音</div>
+  <div id="sub">multi-dimensional particle bodies</div>
+  <div id="hint">鼠标上下移动会明显进入不同空间 ｜ 左右移动 = 多维视差 ｜ 纯粒子图像体</div>
 </div>
 <div id="cursor1"></div><div id="cursor2"></div>
 <audio id="bgm" src="winter_sun.m4a" preload="auto" loop></audio>
@@ -100,21 +95,13 @@ canvas{position:fixed;inset:0;display:block}
   const ctx = canvas.getContext('2d');
   const DPR = Math.min(window.devicePixelRatio || 1, 2);
 
-  const state = {
-    w: innerWidth, h: innerHeight,
-    mx: 0, my: 0,
-    targetDepth: 0, depth: 0,
-    energy: 0, pulse: 0,
-    soundOn: false,
-  };
-
+  const state = { w: innerWidth, h: innerHeight, mx: 0, my: 0, targetDepth: 0, depth: 0, energy: 0, pulse: 0, soundOn: false };
   const stageDefs = [
     { name: 'GALAXY', sub: 'blue-black seed × violet-gold drift' },
     { name: 'SPACE POD', sub: 'glass orbit · vessel of arrival' },
     { name: 'OUTSIDE HOME', sub: 'garden threshold · flowering gravity' },
     { name: 'INSIDE HOME', sub: 'warm sunset room · sea-facing return' },
   ];
-
   const stageEls = [...document.querySelectorAll('.stage')];
   const labelEl = document.getElementById('label');
   const subEl = document.getElementById('sub');
@@ -159,9 +146,7 @@ canvas{position:fixed;inset:0;display:block}
     moveCursor(t.clientX, t.clientY);
   }, { passive: true });
 
-  addEventListener('dblclick', () => {
-    state.pulse = 1;
-  });
+  addEventListener('dblclick', () => state.pulse = 1);
 
   const bgm = document.getElementById('bgm');
   const soundBtn = document.getElementById('sound');
@@ -181,10 +166,10 @@ canvas{position:fixed;inset:0;display:block}
     }
   });
 
-  function updateUI(idx) {
-    stageEls.forEach((el, i) => el.classList.toggle('active', i === idx));
-    labelEl.textContent = stageDefs[idx].name;
-    subEl.textContent = stageDefs[idx].sub;
+  function updateUI(i) {
+    stageEls.forEach((el, idx) => el.classList.toggle('active', idx === i));
+    labelEl.textContent = stageDefs[i].name;
+    subEl.textContent = stageDefs[i].sub;
   }
 
   const hiddenCanvas = document.createElement('canvas');
@@ -199,11 +184,10 @@ canvas{position:fixed;inset:0;display:block}
     });
   }
 
-  function sampleImageParticles(img, options) {
-    const sample = options.sample || 7;
+  function sampleLayers(img, options) {
+    const sample = options.sample || 6;
     const width = options.width || 400;
-    const depth = options.depth || 24;
-    const alpha = options.alpha || 0.85;
+    const depth = options.depth || 36;
     const ratio = img.height / img.width;
     const height = width * ratio;
 
@@ -211,34 +195,39 @@ canvas{position:fixed;inset:0;display:block}
     hiddenCanvas.height = img.height;
     hctx.clearRect(0, 0, img.width, img.height);
     hctx.drawImage(img, 0, 0);
-
     const data = hctx.getImageData(0, 0, img.width, img.height).data;
-    const pts = [];
 
+    const back = [], mid = [], front = [];
     for (let y = 0; y < img.height; y += sample) {
       for (let x = 0; x < img.width; x += sample) {
         const i = (y * img.width + x) * 4;
         const a = data[i + 3] / 255;
-        if (a < 0.16) continue;
-        const r = data[i] / 255;
-        const g = data[i + 1] / 255;
-        const b = data[i + 2] / 255;
+        if (a < 0.15) continue;
+        const r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
         const lum = (r + g + b) / 3;
-        if (lum < 0.05) continue;
-        if (Math.random() > 0.42 + lum * 0.48) continue;
-        pts.push({
+        if (lum < 0.04) continue;
+        const roll = Math.random();
+        if (roll > 0.35 + lum * 0.55) continue;
+
+        const edgeX = Math.abs(x / img.width - 0.5) * 2;
+        const edgeY = Math.abs(y / img.height - 0.5) * 2;
+        const edge = Math.max(edgeX, edgeY);
+        const zBase = (0.55 - edge * 0.35 + lum * 0.6);
+        const p = {
           x: (x / img.width - 0.5) * width,
           y: -(y / img.height - 0.5) * height,
-          z: (Math.random() - 0.5) * depth,
+          z: (Math.random() - 0.5) * depth * zBase,
           r, g, b,
-          a: alpha,
-          size: 0.7 + lum * 1.4 + Math.random() * 0.35,
+          a: 0.82 + lum * 0.12,
+          size: 0.55 + lum * 1.35 + Math.random() * 0.28,
           seed: Math.random() * Math.PI * 2
-        });
+        };
+        if (lum > 0.68) front.push(p);
+        else if (lum > 0.38) mid.push(p);
+        else back.push(p);
       }
     }
-
-    return { width, height, pts };
+    return { width, height, back, mid, front };
   }
 
   const groups = [];
@@ -263,86 +252,42 @@ canvas{position:fixed;inset:0;display:block}
     loadImage(imageFiles.in1),
     loadImage(imageFiles.in2),
   ]).then(([galaxy, pod1, pod2, pod3, home1, home2, in1, in2]) => {
-    groups.push({
-      stage: 0,
-      x: 0, y: 0, z: 0,
-      aura: 'rgba(151,117,255,0.12)',
-      particles: sampleImageParticles(galaxy, { sample: 7, width: 680, depth: 40, alpha: 0.90 })
-    });
+    groups.push({ stage: 0, x: 0, y: 0, z: 0, aura: 'rgba(151,117,255,0.10)', layers: sampleLayers(galaxy, { sample: 5, width: 760, depth: 58 }) });
 
-    groups.push({
-      stage: 1,
-      x: -230, y: 35, z: 0,
-      aura: 'rgba(105,207,255,0.10)',
-      particles: sampleImageParticles(pod1, { sample: 8, width: 400, depth: 22, alpha: 0.85 })
-    });
-    groups.push({
-      stage: 1,
-      x: 240, y: -85, z: -95,
-      aura: 'rgba(120,147,255,0.10)',
-      particles: sampleImageParticles(pod2, { sample: 8, width: 335, depth: 22, alpha: 0.85 })
-    });
-    groups.push({
-      stage: 1,
-      x: 5, y: 175, z: -160,
-      aura: 'rgba(143,226,255,0.10)',
-      particles: sampleImageParticles(pod3, { sample: 9, width: 290, depth: 18, alpha: 0.82 })
-    });
+    groups.push({ stage: 1, x: -245, y: 30, z: 0, aura: 'rgba(105,207,255,0.08)', layers: sampleLayers(pod1, { sample: 6, width: 420, depth: 30 }) });
+    groups.push({ stage: 1, x: 250, y: -95, z: -120, aura: 'rgba(120,147,255,0.08)', layers: sampleLayers(pod2, { sample: 6, width: 350, depth: 28 }) });
+    groups.push({ stage: 1, x: 0, y: 185, z: -200, aura: 'rgba(143,226,255,0.08)', layers: sampleLayers(pod3, { sample: 7, width: 300, depth: 24 }) });
 
-    groups.push({
-      stage: 2,
-      x: -235, y: 35, z: 0,
-      aura: 'rgba(255,199,223,0.08)',
-      particles: sampleImageParticles(home1, { sample: 8, width: 360, depth: 16, alpha: 0.83 })
-    });
-    groups.push({
-      stage: 2,
-      x: 245, y: -20, z: -100,
-      aura: 'rgba(215,173,255,0.08)',
-      particles: sampleImageParticles(home2, { sample: 8, width: 340, depth: 16, alpha: 0.83 })
-    });
+    groups.push({ stage: 2, x: -250, y: 40, z: 0, aura: 'rgba(255,199,223,0.07)', layers: sampleLayers(home1, { sample: 6, width: 380, depth: 22 }) });
+    groups.push({ stage: 2, x: 255, y: -20, z: -110, aura: 'rgba(215,173,255,0.07)', layers: sampleLayers(home2, { sample: 6, width: 350, depth: 20 }) });
 
-    groups.push({
-      stage: 3,
-      x: -200, y: 0, z: 0,
-      aura: 'rgba(242,208,151,0.10)',
-      particles: sampleImageParticles(in1, { sample: 8, width: 340, depth: 14, alpha: 0.83 })
-    });
-    groups.push({
-      stage: 3,
-      x: 220, y: -10, z: -90,
-      aura: 'rgba(255,167,125,0.10)',
-      particles: sampleImageParticles(in2, { sample: 8, width: 320, depth: 14, alpha: 0.83 })
-    });
+    groups.push({ stage: 3, x: -210, y: 0, z: 0, aura: 'rgba(242,208,151,0.08)', layers: sampleLayers(in1, { sample: 6, width: 360, depth: 18 }) });
+    groups.push({ stage: 3, x: 225, y: -8, z: -95, aura: 'rgba(255,167,125,0.08)', layers: sampleLayers(in2, { sample: 6, width: 338, depth: 18 }) });
   }).catch(err => console.error(err));
 
-  const starField = Array.from({ length: 1700 }, () => ({
-    x: (Math.random() - 0.5) * 2200,
-    y: (Math.random() - 0.5) * 1300,
-    z: Math.random() * 2300,
+  const stars = Array.from({ length: 1900 }, () => ({
+    x: (Math.random() - 0.5) * 2600,
+    y: (Math.random() - 0.5) * 1500,
+    z: Math.random() * 2800,
     c: ['#4f7fff', '#8d65ff', '#f4be76', '#7fe9ff', '#bb83ff'][Math.floor(Math.random() * 5)],
-    s: 0.45 + Math.random() * 1.8
+    s: 0.3 + Math.random() * 1.55
   }));
 
-  const homeDust = Array.from({ length: 420 }, () => ({
-    x: (Math.random() - 0.5) * 650,
-    y: (Math.random() - 0.5) * 380,
-    z: Math.random() * 320,
+  const homeDust = Array.from({ length: 520 }, () => ({
+    x: (Math.random() - 0.5) * 760,
+    y: (Math.random() - 0.5) * 440,
+    z: Math.random() * 360,
     c: ['#ffd9ad', '#ffb68b', '#fff2dd', '#f5c9a8'][Math.floor(Math.random() * 4)],
-    s: 0.6 + Math.random() * 2.4
+    s: 0.55 + Math.random() * 2.2
   }));
 
   function project(x, y, z, camZ) {
     const dz = z - camZ;
-    const f = 960 / Math.max(260, dz + 960);
-    return {
-      x: state.w / 2 + x * f,
-      y: state.h / 2 + y * f,
-      s: f
-    };
+    const f = 1000 / Math.max(220, dz + 1000);
+    return { x: state.w / 2 + x * f, y: state.h / 2 + y * f, s: f };
   }
 
-  function drawGlow(x, y, r, rgba) {
+  function glow(x, y, r, rgba) {
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
     g.addColorStop(0, rgba.replace('ALPHA', '1'));
     g.addColorStop(1, rgba.replace('ALPHA', '0'));
@@ -352,84 +297,89 @@ canvas{position:fixed;inset:0;display:block}
     ctx.fill();
   }
 
-  let t = 0;
+  function drawLayer(layer, gx, gy, gz, camZ, vis, strength) {
+    for (const p of layer) {
+      const px = gx + p.x + Math.sin(time * 0.75 + p.seed) * (1.2 + strength * 2.8);
+      const py = gy + p.y + Math.cos(time * 0.62 + p.seed * 1.7) * (1.2 + strength * 2.4);
+      const pz = gz + p.z + Math.sin(time * 0.84 + p.seed) * (1.8 + strength * 5.4);
+      const pr = project(px, py, pz, camZ);
+      if (pr.x < -20 || pr.x > state.w + 20 || pr.y < -20 || pr.y > state.h + 20) continue;
+      const r = p.size * pr.s;
+      ctx.globalAlpha = p.a * vis;
+      ctx.fillStyle = `rgba(${Math.round(p.r*255)},${Math.round(p.g*255)},${Math.round(p.b*255)},1)`;
+      ctx.beginPath();
+      ctx.arc(pr.x, pr.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  let time = 0;
   function render() {
     requestAnimationFrame(render);
-    t += 0.016;
+    time += 0.016;
 
-    state.depth += (state.targetDepth - state.depth) * 0.075;
+    state.depth += (state.targetDepth - state.depth) * 0.08;
     state.energy += ((((state.soundOn ? 0.18 : 0.08) + Math.abs(state.mx) * 0.05 + Math.abs(state.my) * 0.04)) - state.energy) * 0.06;
     state.pulse *= 0.92;
 
     const depth = Math.max(0, Math.min(3, state.depth));
     const stageIdx = Math.round(depth);
     updateUI(stageIdx);
-
     const insideProgress = Math.max(0, Math.min(1, (depth - 2.2) / 0.8));
 
     const bg = ctx.createLinearGradient(0, 0, 0, state.h);
     bg.addColorStop(0, '#02030a');
-    bg.addColorStop(0.55, '#080b16');
-    bg.addColorStop(1, insideProgress > 0 ? '#231713' : '#0b0f1b');
+    bg.addColorStop(0.55, '#070a14');
+    bg.addColorStop(1, insideProgress > 0 ? '#221611' : '#0b0f1b');
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, state.w, state.h);
 
-    const camZ = depth * 420; // much stronger stage travel
-    const parX = state.mx * 62;
-    const parY = -state.my * 38;
+    const camZ = depth * 520; // stronger actual movement
+    const parX = state.mx * 86;
+    const parY = -state.my * 48;
 
-    for (const s of starField) {
-      const p = project(s.x + parX * 0.22, s.y + parY * 0.22, s.z, camZ * 0.35);
+    for (const s of stars) {
+      const p = project(s.x + parX * 0.16, s.y + parY * 0.16, s.z, camZ * 0.3);
       if (p.x < -20 || p.x > state.w + 20 || p.y < -20 || p.y > state.h + 20) continue;
-      ctx.globalAlpha = 0.10 + p.s * 0.24;
+      ctx.globalAlpha = 0.07 + p.s * 0.22;
       ctx.fillStyle = s.c;
       ctx.beginPath();
       ctx.arc(p.x, p.y, s.s * p.s, 0, Math.PI * 2);
       ctx.fill();
     }
 
-    const heartBaseZ = depth * 350;
-    const hb = project(Math.cos(t * 0.72) * 125 + parX * 0.18, Math.sin(t * 0.86) * 38 + 24 + parY * 0.12, heartBaseZ + Math.sin(t) * 24, camZ);
-    const hg = project(Math.cos(t * -0.64) * 116 + parX * 0.16, Math.sin(t * -0.78) * 34 - 22 + parY * 0.10, heartBaseZ - 34 + Math.sin(t * 0.9) * 20, camZ);
-    drawGlow(hb.x, hb.y, 34 * hb.s * (1 + state.energy), 'rgba(98,166,255,ALPHA)');
-    drawGlow(hg.x, hg.y, 30 * hg.s * (1 + state.energy), 'rgba(100,255,175,ALPHA)');
+    const heartBaseZ = depth * 430;
+    const hb = project(Math.cos(time * 0.72) * 128 + parX * 0.10, Math.sin(time * 0.86) * 40 + 26 + parY * 0.08, heartBaseZ + Math.sin(time) * 26, camZ);
+    const hg = project(Math.cos(time * -0.64) * 118 + parX * 0.08, Math.sin(time * -0.78) * 36 - 22 + parY * 0.07, heartBaseZ - 38 + Math.sin(time * 0.9) * 22, camZ);
+    glow(hb.x, hb.y, 34 * hb.s * (1 + state.energy), 'rgba(98,166,255,ALPHA)');
+    glow(hg.x, hg.y, 30 * hg.s * (1 + state.energy), 'rgba(100,255,175,ALPHA)');
 
     for (const group of groups) {
-      const stageDistance = group.stage - depth;
-      const visibility = Math.max(0, 1 - Math.abs(stageDistance) * 0.95);
-      if (visibility < 0.02) continue;
+      const d = group.stage - depth;
+      const vis = Math.max(0, 1 - Math.abs(d) * 1.1);
+      if (vis < 0.015) continue;
 
-      const narrativeZ = group.stage * 420 + group.z + stageDistance * 260; // strong enter/exit
-      const gx = group.x + parX * (0.18 + group.stage * 0.02);
-      const gy = group.y + parY * (0.14 + group.stage * 0.02);
+      const gz = group.stage * 520 + group.z + d * 320; // enter/exit space strongly
+      const gx = group.x + parX * (0.15 + group.stage * 0.02);
+      const gy = group.y + parY * (0.12 + group.stage * 0.02);
 
-      const auraP = project(gx, gy, narrativeZ - 25, camZ);
-      ctx.globalAlpha = 0.45 * visibility;
+      const auraP = project(gx, gy, gz - 20, camZ);
+      ctx.globalAlpha = 0.42 * vis;
       ctx.fillStyle = group.aura;
       ctx.beginPath();
-      ctx.ellipse(auraP.x, auraP.y, group.particles.width * 0.52 * auraP.s, group.particles.height * 0.52 * auraP.s, 0, 0, Math.PI * 2);
+      ctx.ellipse(auraP.x, auraP.y, group.layers.width * 0.46 * auraP.s, group.layers.height * 0.46 * auraP.s, 0, 0, Math.PI * 2);
       ctx.fill();
 
-      for (const p of group.particles.pts) {
-        const px = gx + p.x + Math.sin(t * 0.9 + p.seed) * (1.4 + state.energy * 2.4);
-        const py = gy + p.y + Math.cos(t * 0.7 + p.seed * 1.6) * (1.4 + state.energy * 2.0);
-        const pz = narrativeZ + p.z + Math.sin(t * 0.8 + p.seed) * (2.2 + state.energy * 4.2);
-        const pr = project(px, py, pz, camZ);
-        if (pr.x < -20 || pr.x > state.w + 20 || pr.y < -20 || pr.y > state.h + 20) continue;
-        const r = p.size * pr.s;
-        ctx.globalAlpha = p.a * visibility;
-        ctx.fillStyle = `rgba(${Math.round(p.r*255)},${Math.round(p.g*255)},${Math.round(p.b*255)},1)`;
-        ctx.beginPath();
-        ctx.arc(pr.x, pr.y, r, 0, Math.PI * 2);
-        ctx.fill();
-      }
+      drawLayer(group.layers.back, gx, gy, gz - 18, camZ, vis * 0.65, state.energy);
+      drawLayer(group.layers.mid, gx, gy, gz, camZ, vis * 0.88, state.energy);
+      drawLayer(group.layers.front, gx, gy, gz + 18, camZ, vis, state.energy + state.pulse * 0.5);
     }
 
     if (insideProgress > 0.02) {
       for (const d of homeDust) {
-        const p = project(d.x + parX * 0.10, d.y + parY * 0.10, 1260 + d.z, camZ);
+        const p = project(d.x + parX * 0.08, d.y + parY * 0.08, 1560 + d.z, camZ);
         if (p.x < -10 || p.x > state.w + 10 || p.y < -10 || p.y > state.h + 10) continue;
-        ctx.globalAlpha = insideProgress * 0.22;
+        ctx.globalAlpha = insideProgress * 0.20;
         ctx.fillStyle = d.c;
         ctx.beginPath();
         ctx.arc(p.x, p.y, d.s * p.s, 0, Math.PI * 2);
